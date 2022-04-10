@@ -6,7 +6,8 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "serve": "vite preview",
-    "test": "jest src"
+    "test:unit": "jest --clearCache && jest",
+    "test:unit:coverage": "jest --clearCache && jest --coverage"
   },
   "dependencies": {
     "vue": "^3.2.25"
