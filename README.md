@@ -22,6 +22,7 @@ If you're on a Unix based shell you can have the `pnpm dev` command open in a sp
 If you do not want to use that feature, just provide your `.envrc` excluding the `BROWSER` export.
 
 ## Recommended IDE Setup
-- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.vscode-typescript-vue-plugin) + [CodeMetrics](https://marketplace.visualstudio.com/items?itemName=kisstkondoros.vscode-codemetrics)
-- [IntelliJ](https://www.jetbrains.com/de-de/idea/) + [Vue.js](https://plugins.jetbrains.com/plugin/9442-vue-js) + [Prettier](https://plugins.jetbrains.com/plugin/10456-prettier) + [SonarLint](https://plugins.jetbrains.com/plugin/7973-sonarlint)
+Choose *one setup for all* participants. Unfortunately, *CodeTogether* and *Code With Me* are not compatible with each other. 
+- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.vscode-typescript-vue-plugin) + [CodeMetrics](https://marketplace.visualstudio.com/items?itemName=kisstkondoros.vscode-codemetrics) + [CodeTogether](https://marketplace.visualstudio.com/items?itemName=genuitecllc.codetogether)
+- [IntelliJ](https://www.jetbrains.com/de-de/idea/) + [Vue.js](https://plugins.jetbrains.com/plugin/9442-vue-js) + [Prettier](https://plugins.jetbrains.com/plugin/10456-prettier) + [SonarLint](https://plugins.jetbrains.com/plugin/7973-sonarlint) + [Code With Me](https://www.jetbrains.com/de-de/code-with-me/)
 
