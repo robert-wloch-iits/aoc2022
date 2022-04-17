@@ -20,11 +20,3 @@ else
   echo "Using pnpm CLI $(pnpm --version)"
 fi
 
-if ! command -v vue &> /dev/null
-then
-  echo "Vue CLI not found. Attempting to install it."
-  npm install -g @vue/cli
-else
-  echo "Using vue CLI $(vue --version | cut -d ' ' -f 2)"
-fi
-
