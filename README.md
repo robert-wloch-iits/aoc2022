@@ -1,16 +1,27 @@
 # Vue 3 + Typescript + Vite
 
-This template should help get you started developing with Vue 3 and Typescript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+This template should help get you started developing with Vue 3, Typescript and Jest Unit Testing in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+
+## Shell Setup
+### nvm
+Please install `nvm`.
+
+### direnv
+Copy the file `.envrc.template` to `.envrc`.
+Install `direnv` and run `direnv allow` on the repository root.
+
+The provided `.envrc` configuration uses `nvm` to install a specific `node` version, it installs `pnpm` globally.
+
+### pnpm
+The project uses `pnpm` as package manager. Its commands are essentially similar to `yarn`. `pnpm` needs the `.npmrc` file which is already part of the repostory. To install the project dependencies run `pnpm install`.
+
+### Open Browser Automatically
+If you're on a Unix based shell you can have the `pnpm dev` command open in a specific browser in incognito / private browsing mode automatically.
+`.envrc` is already prepared for that. Just adapt the contents of the file `.open-browser.js` to your needs.
+
+If you do not want to use that feature, just provide your `.envrc` excluding the `BROWSER` export.
 
 ## Recommended IDE Setup
+- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.vscode-typescript-vue-plugin) + [CodeMetrics](https://marketplace.visualstudio.com/items?itemName=kisstkondoros.vscode-codemetrics)
+- [IntelliJ](https://www.jetbrains.com/de-de/idea/) + [Vue.js](https://plugins.jetbrains.com/plugin/9442-vue-js) + [Prettier](https://plugins.jetbrains.com/plugin/10456-prettier) + [SonarLint](https://plugins.jetbrains.com/plugin/7973-sonarlint)
 
-- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
-
-## Type Support For `.vue` Imports in TS
-
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
-
-1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
