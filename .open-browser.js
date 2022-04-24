@@ -25,7 +25,7 @@ if (!browserCommand) {
 // console.log(JSON.stringify(args));
 
 const args = process.argv.slice(2);
-if (args.length > 0) {
+if (browserCommand && args.length > 0) {
   // vite preview sends "preview" as first argument!
   const url = args.length === 2 ? args[1] : args[0];
   // console.log(`exec: ${browserCommand} --incognito --new-window ${url}`);
