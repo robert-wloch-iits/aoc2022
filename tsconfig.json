@@ -11,15 +11,25 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@unit/*": ["tests/unit/*"]
+      "@unit/*": ["tests/unit/*"],
+      "@e2e/*": ["tests/e2e/*"]
     },
     "types": ["vite/client", "@types/jest"],
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "esModuleInterop": true,
     "lib": ["esnext", "dom"]
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "tests/**/*.js", "tests/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "tests/**/*.js",
+    "tests/**/*.ts",
+    "e2e/**/*.js",
+    "e2e/**/*.ts"
+  ],
   "exclude": ["node_modules"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
