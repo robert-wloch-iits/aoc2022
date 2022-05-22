@@ -27,8 +27,7 @@
     "src/**/*.vue",
     "tests/**/*.js",
     "tests/**/*.ts",
-    "e2e/**/*.js",
-    "e2e/**/*.ts"
+    "tests/**/*.d.ts",
   ],
   "exclude": ["node_modules"],
   "references": [{ "path": "./tsconfig.node.json" }]
