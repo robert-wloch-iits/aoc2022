@@ -22,9 +22,13 @@ module.exports = {
     '!**/*.d.ts',
     '!**/node_modules/**',
     '!**/dist/**',
+    '!**/fileMock.ts',
   ],
   coverageDirectory: '<rootDir>/tests/unit_coverage',
   maxWorkers: '50%',
-  testMatch: ['**/tests/unit/**/?(*.)+(spec|test).[jt]s?(x)'],
+  testMatch: [
+    '**/tests/unit/**/?(*.)+(spec|test).[jt]s?(x)',
+    '!**/tests/unit/**/example.(spec|test).[jt]s?(x)',
+  ],
   testTimeout: 10000,
 }
