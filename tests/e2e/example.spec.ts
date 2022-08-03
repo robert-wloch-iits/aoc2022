@@ -1,6 +1,6 @@
 import {Selector} from 'testcafe'
 
-fixture`Getting Started`.page`http://localhost:3000/`
+fixture`Getting Started`.page`http://127.0.0.1:5173/`
 
 test('Click on counter button increases count', async (t) => {
   await t
