@@ -24,3 +24,8 @@ unit_coverage
 *.njsproj
 *.sln
 *.sw?
+
+# test related
+src/__snapshots__/
+tests/unit/__snapshots__/
+coverage/

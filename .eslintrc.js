@@ -7,22 +7,23 @@ module.exports = {
     'vue/setup-compiler-macros': true,
   },
   extends: [
-    'eslint:recommended', //
-    'plugin:@typescript-eslint/eslint-recommended',
+    'eslint:recommended', // this maybe causes errors in defineEmits<{}>() ???
+    // 'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:vue/vue3-recommended',
-    'plugin:prettier-vue/recommended',
+    // 'plugin:prettier-vue/recommended',
     'prettier',
   ],
+  /* globals: {
+    defineEmits: 'readonly',
+    defineProps: 'readonly',
+  }, */
+  parser: 'vue-eslint-parser',
   parserOptions: {
     parser: '@typescript-eslint/parser',
-
-    requireConfigFile: false,
-    parserOptions: {
-      sourceType: 'module',
-      allowImportExportEverywhere: true,
-    },
+    sourceType: 'module',
   },
+  // plugins: ['@typescript-eslint'], // might not be needed
   rules: {
     'vue/component-name-in-template-casing': ['error', 'kebab-case'],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
@@ -49,15 +50,4 @@ module.exports = {
       },
     ],
   },
-  overrides: [
-    {
-      files: [
-        '**/__tests__/*.{j,t}s?(x)',
-        '**/tests/unit/**/*.spec.{j,t}s?(x)',
-      ],
-      env: {
-        jest: true,
-      },
-    },
-  ],
 }

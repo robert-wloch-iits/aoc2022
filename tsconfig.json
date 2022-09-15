@@ -7,29 +7,34 @@
     "strict": true,
     "jsx": "preserve",
     "sourceMap": true,
-    "noEmit": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "lib": ["esnext", "dom"],
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["./src/*"],
       "@fixtures/*": ["tests/fixtures/*"],
       "@unit/*": ["tests/unit/*"],
-      "@e2e/*": ["tests/e2e/*"]
+      "@e2e/*": ["tests/e2e/*"],
     },
-    "types": ["vite/client", "@types/jest"],
-    "resolveJsonModule": true,
-    "isolatedModules": false,
-    "esModuleInterop": true,
-    "lib": ["esnext", "dom"]
+    "types": [
+      "vitest/globals"
+    ],
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
+    "src/**/*.ts", 
+    "src/**/*.d.ts", 
+    "src/**/*.tsx", 
     "src/**/*.vue",
-    "tests/**/*.js",
     "tests/**/*.ts",
     "tests/**/*.d.ts",
+    "tests/**/*.tsx",
+    "tests/**/*.vue",
   ],
-  "exclude": ["node_modules"],
+  "exclude": [
+    "node_modules"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
