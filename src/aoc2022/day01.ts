@@ -1,21 +1,15 @@
-type Elf = {
+export type Elf = {
   calories: number[]
   totalCalories: number,
 }
 
-type ElvesWithMaxTotalCalories = {
+export type ElvesWithMaxTotalCalories = {
   elfNumber: number,
   elf: Elf,
 }
-function templateElf(): Elf {
-  return {
-    calories: [],
-    totalCalories: 0,
-  } 
-}
 
 export function convertInputToElves(input: string): Elf[] {
-  const inputAsArray = input ? input.split('\n') : []
+  const inputAsArray = input?.trim() ? input.trim().split('\n') : []
   const result: Elf[] = []
 
   if (inputAsArray.length) {
@@ -39,5 +33,14 @@ export function convertInputToElves(input: string): Elf[] {
 
 export function findElfWithMostCalories(elves: Elf[]): ElvesWithMaxTotalCalories[] {
   const result: ElvesWithMaxTotalCalories[] = []
+  if (elves.length) {
+    const maxTotalCalories = Math.max(...elves.map(e => e.totalCalories))
+    for (let index = 0; index < elves.length; index++) {
+      const elf = elves[index];
+      if (maxTotalCalories === elves[index].totalCalories) {
+        result.push({elfNumber: index + 1, elf})
+      }
+    }
+  }
   return result
 }
