@@ -44,3 +44,16 @@ export function findElfWithMostCalories(elves: Elf[]): ElvesWithMaxTotalCalories
   }
   return result
 }
+
+export function findTopThreeElvesWithMostCalories(elves: Elf[]): ElvesWithMaxTotalCalories[] {
+  const result: ElvesWithMaxTotalCalories[] = []
+  if (elves.length) {
+    const sortedElves = [...elves].sort((a, b) => b.totalCalories - a.totalCalories)
+    const topThreeElves = sortedElves.slice(0, 3)
+    topThreeElves.forEach(elf => {
+      const elfNumber = elves.findIndex(e => e.totalCalories === elf.totalCalories) + 1
+      result.push({elfNumber, elf})
+    });
+  }
+  return result
+}
