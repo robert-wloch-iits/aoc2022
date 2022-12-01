@@ -1,0 +1,48 @@
+default:
+  image: node:19.0-alpine
+
+stages:
+  - unit
+  - e2e
+  - build
+  - deploy
+
+test-unit-job:
+  stage: unit
+  script:
+    - echo "test-unit-job of unit stage on $CI_COMMIT_BRANCH branch for $GITLAB_USER_LOGIN"
+    - npm install -g pnpm
+    - pnpm install --no-frozen-lockfile
+    - pnpm test:unit
+
+test-e2e-job:
+  stage: e2e
+  rules:
+    - when: manual
+  script:
+    - echo "test-e2e-job of e2e stage on $CI_COMMIT_BRANCH branch for $GITLAB_USER_LOGIN"
+    - apt-get install -y gnupg
+    - wget -O- https://dl.google.com/linux/linux_signing_key.pub | gnupg --dearmor | tee /usr/share/keyrings/google-chrome.gpg
+    - echo deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main | tee /etc/apt/sources.list.d/google-chrome.list
+    - apt-get update -y
+    - apt-get install -y google-chrome-stable chromium
+    - npm install -g pnpm
+    - pnpm install --no-frozen-lockfile
+    - pnpm test:e2e:headless
+
+build-job:
+  stage: build
+  rules:
+    - when: manual
+  script:
+    - echo "build-job of build stage on $CI_COMMIT_BRANCH branch for $GITLAB_USER_LOGIN"
+    - npm install -g pnpm
+    - pnpm install --no-frozen-lockfile
+    - pnpm build
+
+deploy-prod:
+  stage: deploy
+  rules:
+    - when: manual
+  script:
+    - echo "deploy-prod-job of deploy stage on $CI_COMMIT_BRANCH branch for $GITLAB_USER_LOGIN"

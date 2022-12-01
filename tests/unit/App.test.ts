@@ -7,7 +7,6 @@ test('mount component', async () => {
   const wrapper = mount(App, {})
 
   expect(wrapper.text()).toContain('Hello Vue 3 + TypeScript + Vite')
-  expect(wrapper.html()).toMatchSnapshot()
 
   expect(wrapper.text()).toContain('count is: 0')
   await wrapper.get('button').trigger('click')
