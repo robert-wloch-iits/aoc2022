@@ -105,7 +105,7 @@ describe('day01', () => {
   })
 
   describe('solves puzzle #1', () => {
-    it('gets an empty list as input and returns no elves', () => {
+    it('gets the puzzle input list and returns the total max calories of the top elf', () => {
       const elves = convertInputToElves(aoc.puzzleInput)
       const elvesWithMaxCalories = findElvesWithMaxCalories(elves)
 
@@ -113,7 +113,7 @@ describe('day01', () => {
         elvesWithMaxCalories.length === 1
           ? elvesWithMaxCalories[0].elf.totalCalories
           : `got ${elvesWithMaxCalories.length} elves in result`
-      console.log('puzzle #1 result: ', solution)
+      console.log('puzzle #1 answer: ', solution)
       expect(solution).toBe(68923)
     })
   })
@@ -144,14 +144,14 @@ describe('day01', () => {
   })
 
   describe('solves puzzle #2', () => {
-    it('gets an empty list as input and returns no elves', () => {
+    it('gets the puzzle input list and returns the total max calories of the top three elves', () => {
       const elves = convertInputToElves(aoc.puzzleInput)
       const topThreeElvesWithMaxCalories =
         findTopThreeElvesWithMostCalories(elves)
       const solution = topThreeElvesWithMaxCalories
         .map((e) => e.elf.totalCalories)
         .reduce((sum, current) => sum + current)
-      console.log('puzzle #2 result: ', solution)
+      console.log('puzzle #2 answer: ', solution)
       expect(solution).toBe(200044)
     })
   })

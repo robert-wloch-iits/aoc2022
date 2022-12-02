@@ -10,7 +10,7 @@ export enum RockPaperScissorsResponseType {
   Z = 3,
 }
 
-export type Strategy = {
+export type StrategyType = {
   choiceOfOpponent: RockPaperScissorsOpponentType,
   response: RockPaperScissorsResponseType,
   score: number,
@@ -41,8 +41,8 @@ export function calculateStrategyScore(choiceOfOpponent: RockPaperScissorsOppone
   return result
 }
 
-export function parseStrategies(input: string): Strategy[] {
-  const result: Strategy[] = []
+export function parseStrategies(input: string): StrategyType[] {
+  const result: StrategyType[] = []
   const inputLinesArray = input?.trim() ? input.trim().split('\n') : []
   
   if (inputLinesArray?.length > 0) {
@@ -58,4 +58,8 @@ export function parseStrategies(input: string): Strategy[] {
 
   }
   return result
+}
+
+export function totalScoreOfStrategies(strategies: StrategyType[]): number {
+  return strategies?.length > 0 ? strategies.map((strategy) => strategy.score).reduce((sum, current) => sum + current) : 0
 }
