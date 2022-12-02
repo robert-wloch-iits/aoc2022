@@ -3,10 +3,13 @@ import {
   parseStrategies,
   calculateStrategyScore,
   totalScoreOfStrategies,
+  findStrategicResponseOnChoiceOfOpponent,
+  parseResponseStrategies,
   RockPaperScissorsOpponentType as OpponentRPS,
   RockPaperScissorsResponseType as ResponseRPS,
   StrategyType as Strategy,
-  ScoresType as Score,
+  RockPaperScissorsResponseStrategyType as ResponseStrategyRPS,
+  ResponseStrategyType as ResponseStrategy,
 } from '@/aoc2022/day02'
 
 const aoc = {
@@ -2578,6 +2581,59 @@ describe('day02', () => {
       const solution: number = totalScoreOfStrategies(parseStrategies(aoc.puzzleInput))
       console.log('puzzle #1 answer: ', solution)
       expect(solution).toBe(10624)
+    })
+  })
+
+  describe('findStrategicResponseOnChoiceOfOpponent', () => {
+    const testData = [
+      {choiceOfOpponent: OpponentRPS.A, responseStrategy: ResponseStrategyRPS.X, expectedResponse: ResponseRPS.Z},
+      {choiceOfOpponent: OpponentRPS.B, responseStrategy: ResponseStrategyRPS.X, expectedResponse: ResponseRPS.X},
+      {choiceOfOpponent: OpponentRPS.C, responseStrategy: ResponseStrategyRPS.X, expectedResponse: ResponseRPS.Y},
+      {choiceOfOpponent: OpponentRPS.A, responseStrategy: ResponseStrategyRPS.Y, expectedResponse: ResponseRPS.X},
+      {choiceOfOpponent: OpponentRPS.B, responseStrategy: ResponseStrategyRPS.Y, expectedResponse: ResponseRPS.Y},
+      {choiceOfOpponent: OpponentRPS.C, responseStrategy: ResponseStrategyRPS.Y, expectedResponse: ResponseRPS.Z},
+      {choiceOfOpponent: OpponentRPS.A, responseStrategy: ResponseStrategyRPS.Z, expectedResponse: ResponseRPS.Y},
+      {choiceOfOpponent: OpponentRPS.B, responseStrategy: ResponseStrategyRPS.Z, expectedResponse: ResponseRPS.Z},
+      {choiceOfOpponent: OpponentRPS.C, responseStrategy: ResponseStrategyRPS.Z, expectedResponse: ResponseRPS.X},
+    ]
+
+    it.each(testData)('gets $choiceOfOpponent, $responseStrategy as input and returns $expectedResponse', ({choiceOfOpponent, responseStrategy, expectedResponse}) => {
+      const result = findStrategicResponseOnChoiceOfOpponent(choiceOfOpponent, responseStrategy)
+      expect(result).toBe(expectedResponse)
+    })
+  })
+
+  describe('parseResponseStrategies', () => {
+    it('gets an empty list as input and returns no strategies', () => {
+      const result: ResponseStrategy[] = parseResponseStrategies(``)
+      expect(result.length).toBe(0)
+      expect(result).toStrictEqual([])
+    })
+
+    it('gets a list with one entry as input and returns one strategy', () => {
+      const result: ResponseStrategy[] = parseResponseStrategies(`A Y`)
+      expect(result.length).toBe(1)
+      expect(result).toStrictEqual([{choiceOfOpponent: OpponentRPS.A, responseStrategy: ResponseStrategyRPS.Y, response: ResponseRPS.X, score: calculateStrategyScore(OpponentRPS.A, ResponseRPS.X)}])
+    })
+
+    it('gets a list with three entries as input and returns three strategies', () => {
+      const result: ResponseStrategy[] = parseResponseStrategies(`A Y
+      B X
+      C Z`)
+      expect(result.length).toBe(3)
+      expect(result).toStrictEqual([
+        {choiceOfOpponent: OpponentRPS.A, responseStrategy: ResponseStrategyRPS.Y, response: ResponseRPS.X, score: calculateStrategyScore(OpponentRPS.A, ResponseRPS.X)},
+        {choiceOfOpponent: OpponentRPS.B, responseStrategy: ResponseStrategyRPS.X, response: ResponseRPS.X, score: calculateStrategyScore(OpponentRPS.B, ResponseRPS.X)},
+        {choiceOfOpponent: OpponentRPS.C, responseStrategy: ResponseStrategyRPS.Z, response: ResponseRPS.X, score: calculateStrategyScore(OpponentRPS.C, ResponseRPS.X)},
+      ])
+    })
+  })
+
+  describe('solves puzzle #2', () => {
+    it('gets the puzzle strategies as input and returns the total score', () => {
+      const solution: number = totalScoreOfStrategies(parseResponseStrategies(aoc.puzzleInput))
+      console.log('puzzle #2 answer: ', solution)
+      expect(solution).toBe(14060)
     })
   })
 })
