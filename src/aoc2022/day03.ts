@@ -37,13 +37,13 @@ export function parseInput(input: string): Rucksack[] {
   const result: Rucksack[] = []
   if (inputAsArray?.length > 0) {
     inputAsArray.forEach(contentsAsString => {
-      result.push({compartments: splitInTwoHalves([...contentsAsString])})
+      result.push({compartments: splitInTwoHalves([...contentsAsString.trim()])})
     });
   }
   return result
 }
 
-export function findDuplicateItemsInCompartments(compartments: string[]): string[] {
+export function findDuplicateItemsInCompartments(compartments: string[][]): string[] {
   const result: string[] = []
   if (compartments?.length === 2) {
     const firstHalf = [...compartments[0]]
@@ -54,6 +54,18 @@ export function findDuplicateItemsInCompartments(compartments: string[]): string
       }
     });
   }
+  return result
+}
 
+export function sumOfPrioritiesOfDuplicateItemsInCompartments(rucksacks: Rucksack[]): number {
+  let result = 0
+  if (rucksacks?.length > 0) {
+    rucksacks.forEach(rucksack => {
+      const duplicatesInCompartment = findDuplicateItemsInCompartments(rucksack.compartments)
+      if (duplicatesInCompartment?.length > 0) {
+        result += duplicatesInCompartment.map(duplicate => priorityOfItem(duplicate)).reduce((sum, current) => sum + current)
+      }
+    })
+  }
   return result
 }

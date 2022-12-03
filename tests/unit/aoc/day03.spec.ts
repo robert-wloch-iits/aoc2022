@@ -1,5 +1,315 @@
 import {describe, it, expect} from 'vitest'
-import {splitInTwoHalves, priorityOfItem, parseInput, findDuplicateItemsInCompartments, Rucksack} from '@/aoc2022/day03'
+import {
+  splitInTwoHalves,
+  priorityOfItem,
+  parseInput,
+  findDuplicateItemsInCompartments,
+  sumOfPrioritiesOfDuplicateItemsInCompartments,
+  Rucksack,
+} from '@/aoc2022/day03'
+
+const aoc = {
+  puzzleInput: `gtZDjBcmpcDgpZcmmbgtdtqmCGVCGGsvhCFCCqvmCMMM
+  JrhfzfLTNfJhPnhQnfzHfCFFQFSGvMFCGQFsQSMSVs
+  TllTRrfNNlfzwhtZBZgtRDBp
+  vMdwjZdjwjvjdTZZvCcQMGnQMQcbcgLLCL
+  rsVhfmssPWzDVGCLJSbCgPLSQG
+  lfWNDHDgfszFRTFtwwNjdv
+  GLPqVqdVGCLCdczjMjzMfzld
+  JnWQvJDmvWBtlMzhrzfHQgcz
+  tDtJDDDDtWRRmBwJwWtpPRsGCGScLPGSqspNCS
+  ChVzZzfNDzNJmBQfjjJfmH
+  MrTMPMncGMJvPPvPWTbrMWvgmBgQwgdpwmdpdpjwpHQcdw
+  SPvvvbqrFvMvZzJzsFVzVJNV
+  mvBbvMFqbMMVVmtCBHpDdDPTDspdNWPDVP
+  zjSfftcQtwtSfQSpNDppsNsjPNdRPP
+  fgfStJShrgvvCLLv
+  GmFnNNwbFFbhQQGQnGwwwfBgnMMqVDBZVVBMfMVzVz
+  vWzRRHzTHcgfZDVfBgfH
+  SSTvrvRcPpcvjFGwNGbNpbwQwz
+  FFgbZZFZgFmpstLgmbtzqNrwVPlMPlSWWrMPNp
+  QQhTvjhcvjjvTcTcTfCcSRwwWzwzPMrzWNNWVVhwrwWq
+  GRQBfCRnGGTcDvBfGvffCCjnFZtFFgStJLbLHbFLJZdgmd
+  pppdjcrMMRDJLJdRcwRDrwssqHGGDHsZHHsvBVtvmVHV
+  nlCFWzGzzQFlSlhGWnPzFbSsBZmsssmVVmsBvnHqvNVqqm
+  lFTTTCSQSTrdGJJLJG
+  jpsGMgsmghQwQsMmhlQshjtTNTRTnFqRWnnqRfFnnt
+  SLBCHrcvZHbSvSZrSvSWnfvVNvftVlFRTqnRTq
+  JrzdZbBcHBCrrlHrrSsMgmGpJPDPQmpgQgPG
+  cmcZHgwgMgHSLmtjLfWPNNrWBNfffp
+  JTqGTsClHslVVRVCVGVJGnBrjdnnrdBNvjPNBNBrWvnW
+  VVlQlqTFJlzzlsVGsRCZMthHDbwbFhgcbwHchg
+  qgZjgjjbssqgsjlNqjhTtdrfQdTdWLLnDVfHtHWd
+  zcGMBDDzcLnztfQQQz
+  JSppJcBScMmMFFBRCpRCMmGlggvjhbhlNlglwbslCZjhDZ
+  hvhmqcqwwcTBvvwQnRQnRnTRFzFzQz
+  jWLPPtPsgMtpdLMLWllpgLLQFQhFJjnVrzFrVFhnRzJJrJ
+  WPWffgtSdspdhSMdlSdtfBbHmSvqbNBCCmcBmcvcCH
+  frVcrVcggfSZJfbbJvBd
+  hwWQnwhWQmQmThTSsdvvSMBTBzcb
+  wGnFFCGlQwntGtCtwntwDmFwRgLrHqNRqqcNNgRrHHLggCjp
+  wRSwwHDMsRGHvNBNjTgvjgJD
+  mcLcFCclWQWQpPQWVQcQcvvNJjrNBTrvgJgBvTRvCg
+  VFPbQLchQLSRfbMtdHGH
+  lfVrhnlRRqrJZVDJdHSWCvJCJSbj
+  BFsgcgMNNQgSvbfCff
+  ffNPcMtzqPlnmRGh
+  ZJplFmRJmWRJRWmTJCvtTtnLCtndCqtqnr
+  SQsVPQHBQZNSNSLCfSLrcLcrrr
+  VMjPjbNMDsVHmRllmZpZWmjh
+  LcTLRbJhhdhLJbbclfVvfWQVWFRWFFfq
+  rZNttSNvtgsPPFsqBFPWQF
+  HGCSmHrrwNnHGMLpDhbzzpmJJv
+  VlSWzRtWSJqWdfhdqBdF
+  mTDHsmmmcHpgrCgCrTsMMtqfsFNsZqfdMZMNbd
+  TDcpvrpHCprCpHrmcQvTHgTQzSnLJnPPJlLzwJtRVJwLjJ
+  vZSWZJZJFvhZldZHdvvlphZSNGNnmzwCPNHNHGNrrRHGCPmP
+  bjfgcbjTQTFQBnGRRBCBNwBnCz
+  csqscsbssQLsgQcLgLQLQTQpFdlhdvdZdpZWhJplShWWtq
+  QgQvHnfflfBwQCfwlfglnQQccNcRqGGcjmcsGjddwdzsJc
+  DhZbTLZTDMVTsRzsqsRjszTz
+  FSZVtMLMMWbSgqSvPQlnpH
+  MMPllnnBmfSHvBgCLf
+  whZjGRJdjcNjjhRjCvgCfbSvCZLHfpZs
+  RRWGWwNRWwhwclmrgFmngFPMWm
+  VVHQGDGDGsdRrmZBQZRCVHZCNcSTTPMwwvTTwSSNqBqvgMvN
+  nfhdLfjFnJpblLbJjWhtnjWPScNnwSTPTPqTvgngNNvSvS
+  fpWljtpLjflfLfzlhZGQHZQVddHrrQRDRz
+  VCHCjwCwMSZSqQzhhQqcWZJD
+  GGGrFFgNRNNgmfnTdgmWQpczvPvQPWQJGDpzzc
+  lgTttRTgmfNRntrTTngrCbjCwJCHjLBBHlMVMsbB
+  szgPPlCblggVszhLmzvcvNrqpjNqmrqqpGvG
+  wBQDtBfQDtFvLjjctLqTMr
+  ZFWWdDLQFwSfDSBSQQBWnnnQVdbhgRVbsHzsshbClzzCVggb
+  VpVsHVcqcMVMMNHpsspstbMqzBztJZTBBfJfzTvZfvWJWSTv
+  mDDQgCQQQHdrwgSvZSmJJZvWfJJf
+  drCjggDlPdgrlbjNcnhcHsbpsj
+  cNNDRRpDcNcTpppsqHLQGLfRLvHzLH
+  lFntJjtbFFlsmsjvnGqHWLfhfqzzQh
+  sgPbjBJtPgbPJblblJgbgbwdBTwDCwpwrdZZVcCcDppc
+  GGclMjLnnjCMchcChLMLcnnzRFJDZJSRSzzzzDSShszPRS
+  VHgFQgwVwfNNpQVfHzQsPPPJDbmZbJDJbS
+  HfNVWdHVvgHgVWVNppNWVHwTlvBFcClBCjcTLTlBnnLrTL
+  GTLdlJhffQwDRvWLrp
+  HVZVNjjsPqzNjNNmNgDWMrRQpWvWRHrDHBWp
+  VCqVzjPjCpVqCVPCsbctcnblcGlTbGnlbFJf
+  flHdfdBNdZcflBMjqMjBNfZQhvJbGvqvsshJQsJCJDWvvD
+  gFTzRRpzRTwbgbLmtCvsJhWsChrWCrtWCC
+  VzzzFbVRLPznmRBffPNBHNMdlZfl
+  FFFMwCqJFFmrRwgnbLrL
+  GpjGpQHQpfjdjDRnLrbrRQmJzzgg
+  BphfhDcNcHNvPBvSqJMWJS
+  NndbWpDBNbjvWLZqWsWQ
+  JPFFTSPfgcMgftQQGjvTmsGqzssG
+  gPgcfcVFgcHqSqVhbBCHlpbbpDlhDD
+  FSdfWFTTBnjsDCjsmrrT
+  pQzLRVLppLGcQjqbmVDJsChCvCbVsm
+  qHLRGqqZzGjLqBNMFdnHlNlBFN
+  DjqbfBTchDjqqCjjCTWNTbdzSVzGZQGBwZnQnVwpSSnQ
+  ssJlPrtvMsRLrrJQGNZJSpZpGzSG
+  rlFssHsvPRPMvFmtHvtqjhTgjbqhWqNmNqgDNh
+  vcpnRqwwLLbvvcGpDQWDFSCgMrWWQWRR
+  gtNfBfllrFlHrlrl
+  ZPzftBmsNBNBPJBZPmZPNtmPdGLsqbwqpqcndVLLGpVGvqgV
+  vRBfQqqBQPfbrFvPBvPbhLDVDVDQZVVtZtlWLLLt
+  jcJmFFwnhJVZLWVl
+  sHTcmNNHzncmcjmdsBCrBCPCrBBqCFrqzb
+  bbZRnGmNnBGGMNRTgCmWWGGSrvSvFHvzFvFQDF
+  LjwphpdPdLpLJVqfJrQzDzfrvQHSvDcQrQ
+  DJphdwDsnmbZsTZM
+  rdNrZNBSzSztnNzWCcNpHlMwlwHWlM
+  QqLGLJvLjtvQWhgHgchHwHJw
+  GtjTGtDRqvfLRGnrzsmZmfrVFBrV
+  TdMhZrTTNvwphcLL
+  WnnmffmDWnWPsPCJNpNcpNVNQp
+  fsjbWfFFfnmmDsFDnnflSSdczlMdTHTzTTRRBdtT
+  cMcPcMcwgWJMjWWhFWCCQCmqCFdh
+  bSLVLblnNnLbVfnsbSbCChSQdChptpdqZrmCmZ
+  DLGNfnGVDNDHbfzjRcRgqHMRBJPc
+  HVFVlVHjzjjlCJjHjCjnvDrggrgLdqzddMqrzz
+  SSfBTmtNdLqngvrm
+  TwnNfPWWpBSBNtTHZCGlPHCQJHZHPV
+  prvccpFQpMcQBwsvssshdwSTPD
+  qbGHVbNJGqwdPgDrTsDJ
+  fGbGqqlGGHflqLlzZBBrRcrtrZlp
+  fCSPhltMBmPmbdgd
+  DjvJJscvTsHHDbWzBWsWbdwgLB
+  VVHDZvTppRcJVFFppvvRJDJqMSGqCtZdthttrnthSZMGCr
+  ZcSrSdrhDjBDDCmZdZmZjhwVHwqVVsMwgswVVwMfhw
+  PNvzTPNbnzcPbGQNJTvqwsWgVgVMMWpQqwgHpp
+  JTPGPTzNttnbRTPlPtNNRlFrFmBcmDljjmBFSCmLZZBr
+  mNvRRCVMtNRdFNtMtBHHprpHgJgJWwpBnprg
+  LZDDlSLlTslDfbcpJJWndwcscnwr
+  qdZZGSDhMVRCGtmC
+  VGFjjgBShGdGzQczcGRG
+  MppqCDfCMwfLDfvNmrtWstRcMPzRMRsRsPQS
+  NwDCffLppbqqrqvTBngSbnBHglZllH
+  vdllJVDzmVDVqvvWvdqJlcWrCsfCsfSSsSJfCSfQQCCbCQ
+  jnTHZPZHMjZhMjTpHgMpgnbNqBstnfrtSSrBSNssCrfN
+  LHLTFLjTMTTTwjHhpHTcwmDcWVDlvRDmvqwWlW
+  rqQsSStdmsdLqlNNPGlGlV
+  FpFpzJNTcHzRHRHlGwFVLFBLFGVvlw
+  WCCjWRNJTJWhQhbhrbnd
+  jsQjfrRTRwzSsRTgNchlnlhqcnlQmQ
+  dFDtdFBDddHLJpVpHHtVbtHFCWlWlGlNlmGggNqgglmcchqb
+  dLDHMVdLtBBDBFVJBFthtJHRTvsMSvsTrTSRvPPjPzSwRP
+  CSPpSrLlrlPrPchLnSlbDbbRttDVhbGRDDJRtD
+  fzfvmzTMmfsFszsHZsHMHVfwtbjBDDGjtRBjQQGGJb
+  HmvmTFmqmTsHqzzzzdTsMMScndccdLppnLCSPcCLrVgr
+  pfMflRnfrnjrpjnFzDpfDMmMLRTLZVTgLsvdZgLLZHSVWZRd
+  tBGNhwPGcNBBWwZddsSTTPgVLPdT
+  JwthtwbbhNBQhwhbBCrzpnprnWnprlzWlClD
+  PPnZZjnFNDjlJJhtMddfTTdD
+  QGLHFWvQJtzfpvCt
+  swqSmmQWLQwFWLwwRcqNNBnnbgPqbPNbglVZ
+  GCLSjjZGZhpvGtBgjJlnJDhhJMVDPnJlJP
+  mNtQQwNzQRHWdJHnPTsddlln
+  zQrfmbtNbcQcrzmrRBZqBcvpjSGLZGLZBB
+  zGNzgsjDssvNbPlWJfJq
+  RLMVSRMLhCLZSMZHDSJWvpcqfbfhvpJqcWPv
+  dMVHLFHLZMLRLLFRHHHVZMgDTntgstGwznzGGnzjDFwG
+  wCLCHLBwzBtQRLHLbNFFfdqdDqVrVfBN
+  JGvljmgGZvMlfDRRnnnZnfND
+  GppRlgJlSllSgjMsmllpTjcCLczWztPWPwwwzWThtcQh
+  WvHbvvWnFHszDRSltcCctCFD
+  gCmJmCCPTPqpgrZtjdRtDRplcSjS
+  rJJrQPPJQmrmrhGTznCfLMMbfvWfbCWQ
+  TqBWtTbFBNNRRtwQpJJvvvZPpTSQ
+  fRMfsMssrGhSmMwSQvvZJm
+  VggcVlsCgHnVFnndbbnR
+  NdrSSWBNPPSWWHPPlwlLZHLZLMhjlLLH
+  pVptMTgVTzLwZTzlbF
+  qsRmRJtsMvMqgqgRvCdcSrWSPcWrDmmdBN
+  nbJnfqWcmCMnSBSHwzWBsHHz
+  dVpdvdppdptppDlvlHcczSgNcgww
+  VGTdTVtGtRLFPTDbcfCmmcCQJQjcrT
+  VTjrjrjTlTjQMdpGrWMSHvSG
+  wnNJbDmttnwnhNwcJmNGdvWvMSfvMfhSSppSdp
+  JznFnNsGnzzGFDJsFNmLgVVQZBlLZjQTLTjTls
+  hpngHwcpWHgjjfhzTJBfBB
+  RFFbFlQlSdRsbRQQMGPRGdSGjBvvNTvzZMBvjzBBTJTvMBBT
+  GPSSPDDDFzGlGGRzLzGGPRWqnprcgCHwCHpwHWVcncLV
+  LLlLGffQLPRThRwP
+  MpZjbmznWqmqZznmzmpZqZnMRgPBCTPfgRTTwTjhwBPPghjP
+  VnZpMsMMJnWsmnJpJmzrtFlGQFrHGvSvfHStNV
+  MQqHMQPnqmpDdTLLRnDjsj
+  NGFzwgtLBtFFGrrCtzgfgCNgSsdTDSSTsdssjDdSlZRjTSBs
+  zCwNLthfrbCgzzhqhmccJPhQHVmV
+  SndBVcgdqcRBRcdPBBcVcQTSSMLMlTssMNMWsHMsLQ
+  GmJvZvhqpvZtNwwWLTTLwMMm
+  JFJpzFGZqjvhGZcjBPcCBBPnnVBc
+  rJWbqTvwvJNbPDPPvLcZvPDp
+  QMnfBsjmFPLcHRDfPp
+  lQlMlmtFsMMBstljlnGhtMhmGNqJqTcWNNbWdGwdNNJCrTrq
+  LcjcNCQNQWDpRDjRTj
+  vWvszVVSsBGWsTJRFHRJTTSTRJ
+  vvGbtqbGVVBqtzbqvBdzVLWNLClwnwMLWlQNMfdPQP
+  TWBZsWrjzZzWBrBsrrsTLNNJvFnJVmlSFFQnGpmnSJJS
+  qdCggdqqqhhqwhRbCwbCPqhlJFPPGJQVvvvnpVVmPnnFvS
+  ffgCfghDqDdCsGWZjTsLrsfW
+  QzQSSQmzSsLQcLmrcsLzccgqCnwqCtZDnDnrZwgnqTTT
+  hFRHHRPRPMtWPGVPRlMljRPCgWBBDTgJBgnwqTZDBZDWDB
+  jPjPHRMjjvdjVFhdNfbsbbQfbcddmNtL
+  jJlTqMqJtdztJqzcSJSlTdSlprLsRRHwcRRrsrHbrnnRHsHL
+  VVVMWNNWmNmLnPLRHrLp
+  NGhfvvVWBNfNNCNCQTMqjzgTQBSSSqll
+  SSSRMRSRpnMRHLqWLfPlDGlGWldD
+  hbNtlmvrNrsVDWsGPfPfqG
+  jvbBNmvlJjRcCzHFppCJ
+  hhWWPjnBGBGnjqBWSnhhsNLllLNcLczJcqcTlLTlfl
+  FHvFFMHwdmvrDbwCbbvHwdHnZTMLzTNTczflJTZclzNLlLcJ
+  HdFFvdDvpCDdrnwrGhBQhWRRpsjQWWQW
+  sBsvtJtdRdjNbWWrTllqlNgg
+  nSZSnPPZzMSnSlScWWWgrVWCrqgrWMWr
+  lzSncQcLZLzlwDvtdDdFdFJJhHvJ
+  lpsTLDlTtFtlWHPDvvgPfgMrQQJM
+  zmNbzcNjzldjwmbdbhhjcjRgfwrgvMwMMSRJSvQQvrRf
+  ZhjqcjzNhmzNqBqNznmcWHplCFGnpCtFsGWHHWsH
+  ZPGQBFHFbhSrHqtfSrSr
+  nMdznzzMDTnjMQrMWtrMptplqpqS
+  wzjczJmccTJCmcVghZBJbPBQBbVh
+  wLLMJbqSBBnnJhbvbFSSRRlztTrHzrrrrd
+  QNNGVPjWPGVqltTHWCqCdH
+  sjNGmmGVGgQNGDVmsVpgqQVpMDhvbLwMffZfhZbLnfLLLZwb
+  gQLcQrMtBPdwSBsSlmBm
+  TfCpTJnTbfqgsgwgppsSzp
+  jVbvTnvWfJnJjjbfCjWWjrFPrLMtcDPgLMQQRtgZVF
+  gwpHvpgwngGHcnvNvgnmsqCzmMzlfqmmqzHHCm
+  JrdSLdBVPRDtRtPfPPzCJhjqmljzmmqszzsM
+  SWLDDtVdrZWtSBRZfRcwgFGnpNFpnTnWnTvT
+  rpcnHrwrhWccNZDDBBgBVCSW
+  nmzFRRjFmmJQNDJC
+  qznMlqGnzRtRGvqGFRPrdMhwTpTLfLcppLHp
+  wthvbmhmChWMRJLJzngZpzLLNC
+  SsdBVjSTjBdffBFfcSdVHfTrnDZGpQgNZHNnLZGpJngJGLng
+  sSdTcdVScdcrccjcrBPrBSjcvmRRwlWPhwmqtgWhMPtmMMqR
+  CJJBdBCrHdBhtRHctBQhRMrBwZpwZWNZNSNTwSNpQWpZsSSW
+  LVFnvnbDjLsDPsPqFFvPvDnTzSTwNwPZpSmpSpgmgZWNTW
+  LjlflbFjsvVlrHcrHtrfcChH
+  tVLJGNRtfBBNGBrfrbzmfhPsrsPC
+  DWWDQHQgllSFqFzcsJmzzSSzmrrs
+  MJFQDgMqnHlDvFdGNBNNZGNVVvjV
+  wnNwGCBBFNWBqjFBnLLGVDHhHmDPHvZTjTvTrPvD
+  bMbttVScMJQtdgSgstbJRSPmrTHmHmrmmSDZlrPrPDhv
+  cMbgpsbVbzbdRMRFWLqzBfLGwwwwfW
+  JpSnGSGpbGgsWWPHJrdfsT
+  MNsRqNNvMQDTLWHlffNHLN
+  qqmtRzRvCRRQDqjqjDmsmRpZwSZbcwbnCcCSBBnSSnnC
+  TWqlqpRqRptqlRhrmtGGzhbSrSdz
+  VgsBVMvgVZfZvPsMVNvfZfvVbSPdhFPFhbzLhJdGFJmLhhhL
+  QZgvZgvHwbwHbMsMRllRjDRDnQRqlRjl
+  fsPQwnHnHLLfnBBnwwGtjTGRWTWTWwhV
+  jblbdjZFDMbGllqTGTtVlq
+  gmdMgZMbjpZDcrrDgdmszsPLpQfpBPPnNQNLLz
+  HRsPPGMhLPMrnPchPSwStjbSttSvtHSqQw
+  dfsCfpCJVJCvdFBFwStwjj
+  gTNWmWfTNVZVJzZWpWJgTpfhnDrMnDclgDlDrDRnRcMLDs
+  ZQZQJMqdwmZvqfPmwRjpBBjHjnshnjtt
+  zcTPTLDTFWLGTrTSWPcDSSHjRlhRsDhHslslssBRljjj
+  TrNFLbTWrGNZvmvVQPQV
+  htfLgmtSLcTWNLcT
+  slbHlBBGbqRsblBHvdNJJcjFFNBTVWWWcn
+  bbQsHMMblHrMsGRqvQhwCTQCwtQCzSpfmS
+  zmqdphmFmSpTzhdqhFmwjjGbtcvDbcGGjllGQjSP
+  HJFrMCsVLrHRRMCNrVMVnctvstlGcQlPtGGjQtGlvP
+  RFLHLVWrNgVJzwzwfgffwdfp
+  vdMjSmMMpmMWhRpndRmZnhvHqLpGHcJGGGDLHHLGcfcLfc
+  lPBwwrsCgLFggcqqLW
+  TWszsWNBTNdmSRvjbZZT
+  zFlBGpzzzLLNjBwPcwwmcNPfWNQn
+  VHSHRJTJDSVVnmcVVPpWmpnf
+  DMZHHrDHHrJrrZrShZsHGbMBbFgGjGCgjpFlBzzb
+  FVMpsvTqvqMssVsWZSrqWFvwlGDGwQzwfwQQNLzDlwlZwf
+  hPbgBHhJJcJPwCwDpNllCCHC
+  pnjbBmjgbgmqtSmsTtsF
+  DHZHmfTmCfjDZHMZmzffHHnQwwTBdQwbSdBGBQwhBQTQww
+  cqstRFWNtLrNFwdVShlBSlhBRl
+  StJWpLptNWLtJcpqPrFHDjZzzvnDDHPCZjPvvz
+  hzffhGVGGhzRqTBLTqHL
+  sFFFsMQlwJMsmrBFSNHTHNqrTS
+  pbdsJMdJMJbwbmJJtbTtgnffGgVVChvD
+  FvJnFnCpQTddSSmFdFpPPsVhppDjBzjDVhDV
+  RgZMZbsgzlDPlhjb
+  cHHHRgRZgfHHZGZfHZcLLHrrCrmJCmddrsvdJsmvFFQG
+  dpJDdZwLnvdvFmFMmHjslMLH
+  CGCztgPhWCWhzzzNNPGfrrWfmbbsmmHjFHDMsbHMsjFPjbHm
+  rNQDGzzhCCfNrzrDzChTcZZvQcTRJpTwdvQpVc
+  VpvNGhGHGNhHbPsbVbvfFtLCzSCFSBsCFSFCLB
+  MlqJwTnrRRrRnMlQMHfHzHzWFWtmTzLWFC
+  ljZDDHqqjqRbpNhjNNgcgc
+  qrQtDzcQzbrcfdbqrQrthtscSsvpvnsSHpTpLpspmsSs
+  CVwNNVRNBSHsLSFBTv
+  CVVVNZjlVlGwlGlljNlWJVrrfqbPQQqHqJhhftbfDJqf
+  lpmrPDPDjPlmWrVzPztZwFjtFbBnRtZbbcRL
+  dnqJCCgQdNqbqRbRbBLt
+  QGhGddGCTdMHNTGgshgJhzvSmWWPSsnprpPzWzsWlr
+  hCJHTdJJNvTdSSNssjvfwgntwDgtgwDGCtZwtRRB
+  mbllFmFMFbMVWWLpbpZwwBZTZnnVwnTggtDB
+  MmzLQpFPTmPzHvfJNNzhNs
+  dzgBwzlgrrBrVLLlwLBgBlgRScDMMDDswMsHZRGDsZGZmM
+  HPfPbjCFJjCvfnnsjsDDcccmZsRSMc
+  hCvHfWPPnvJhPWpqNNhqLqzLqLLd`
+}
 
 describe('day03', () => {
   describe('splitInTwoHalves', () => {
@@ -15,7 +325,7 @@ describe('day03', () => {
       const expectedSecondHalf = [...`hcsFMMfFFhFp`]
       const result = splitInTwoHalves(input)
       expect(result.length).toBe(2)
-      expect(result).toStrictEqual([expectedFirstHalf,expectedSecondHalf])
+      expect(result).toStrictEqual([expectedFirstHalf, expectedSecondHalf])
     })
   })
 
@@ -29,9 +339,12 @@ describe('day03', () => {
       {input: 'P', expected: 42},
       {input: 'Z', expected: 52},
     ]
-    it.each(testData)('gets string %input and returns %expected', ({input, expected}) => {
-      expect(priorityOfItem(input)).toBe(expected)
-    })
+    it.each(testData)(
+      'gets string %input and returns %expected',
+      ({input, expected}) => {
+        expect(priorityOfItem(input)).toBe(expected)
+      }
+    )
   })
 
   describe('parseInput', () => {
@@ -47,7 +360,23 @@ describe('day03', () => {
       const expectedSecondHalf = [...`hcsFMMfFFhFp`]
       const result: Rucksack[] = parseInput(input)
       expect(result.length).toBe(1)
-      expect(result).toStrictEqual([{compartments: [expectedFirstHalf,expectedSecondHalf]}])
+      expect(result).toStrictEqual([
+        {compartments: [expectedFirstHalf, expectedSecondHalf]},
+      ])
+    })
+
+    it('gets a list with two entries as input and returns two rucksacks', () => {
+      const input = `vJrwpWtwJgWrhcsFMMfFFhFp
+      jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL`
+      const expectedFirstHalves = [[...`vJrwpWtwJgWr`], [...`jqHRNqRjqzjGDLGL`]]
+      const expectedSecondHalves = [[...`hcsFMMfFFhFp`], [...`rsFMfFZSrLrFZsSL`]]
+      const result: Rucksack[] = parseInput(input)
+      
+      expect(result.length).toBe(2)
+      expect(result).toStrictEqual([
+        {compartments: [expectedFirstHalves[0], expectedSecondHalves[0]]},
+        {compartments: [expectedFirstHalves[1], expectedSecondHalves[1]]},
+      ])
     })
   })
 
@@ -81,4 +410,35 @@ describe('day03', () => {
     })
   })
 
+  describe('sumOfPrioritiesOfDuplicateItemsInCompartments', () => {
+    it('gets an empty list as input and returns 0', () => {
+      const result = sumOfPrioritiesOfDuplicateItemsInCompartments(parseInput(''))
+      expect(result).toBe(0)
+    })
+
+    it('gets a list with one entry as input and returns 16', () => {
+      const input = `vJrwpWtwJgWrhcsFMMfFFhFp`
+      const result = sumOfPrioritiesOfDuplicateItemsInCompartments(parseInput(input))
+      expect(result).toBe(16)
+    })
+
+    it('gets a list with 6 entries as input and returns 157', () => {
+      const input = `vJrwpWtwJgWrhcsFMMfFFhFp
+      jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+      PmmdzqPrVvPwwTWBwg
+      wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+      ttgJtRGJQctTZtZT
+      CrZsJsPPZsGzwwsLwLmpwMDw`
+      const result = sumOfPrioritiesOfDuplicateItemsInCompartments(parseInput(input))
+      expect(result).toBe(157)
+    })
+  })
+
+  describe('solves puzzle #1', () => {
+    it('gets the puzzle rucksacks as input and returns the total priority of duplicates', () => {
+      const solution: number = sumOfPrioritiesOfDuplicateItemsInCompartments(parseInput(aoc.puzzleInput))
+      console.log('puzzle #1 answer: ', solution)
+      expect(solution).toBe(8394)
+    })
+  })
 })
