@@ -6,6 +6,9 @@ import {
   findDuplicateItemsInCompartments,
   sumOfPrioritiesOfDuplicateItemsInCompartments,
   Rucksack,
+  groupRucksacks,
+  Group,
+  sumOfPrioritiesOfAllBadges,
 } from '@/aoc2022/day03'
 
 const aoc = {
@@ -359,6 +362,7 @@ describe('day03', () => {
       const expectedFirstHalf = [...`vJrwpWtwJgWr`]
       const expectedSecondHalf = [...`hcsFMMfFFhFp`]
       const result: Rucksack[] = parseInput(input)
+      
       expect(result.length).toBe(1)
       expect(result).toStrictEqual([
         {compartments: [expectedFirstHalf, expectedSecondHalf]},
@@ -382,28 +386,28 @@ describe('day03', () => {
 
   describe('findDuplicateItemsInCompartments', () => {
     it('gets an empty list of compartments as input and returns no duplicates', () => {
-      const input: string[] = []
+      const input: string[][] = []
       const result: string[] = findDuplicateItemsInCompartments(input)
       expect(result.length).toBe(0)
       expect(result).toStrictEqual([])
     })
 
     it('gets a list of one compartment with no duplicates as input and returns no duplicates', () => {
-      const input: string[] = [`vJr`, `wpW`]
+      const input: string[][] = [[...`vJr`], [...`wpW`]]
       const result: string[] = findDuplicateItemsInCompartments(input)
       expect(result.length).toBe(0)
       expect(result).toStrictEqual([])
     })
 
     it('gets a list of one compartment with one duplicate as input and returns one duplicate', () => {
-      const input: string[] = [`vJrwpWtwJgWr`, `hcsFMMfFFhFp`]
+      const input: string[][] = [[...`vJrwpWtwJgWr`], [...`hcsFMMfFFhFp`]]
       const result: string[] = findDuplicateItemsInCompartments(input)
       expect(result.length).toBe(1)
       expect(result).toStrictEqual(['p'])
     })
 
     it('gets a list of one compartment with two duplicates as input and returns two duplicates', () => {
-      const input: string[] = [`vJrwpWtwJgWr`, `hcsFMrfFFhFp`]
+      const input: string[][] = [[...`vJrwpWtwJgWr`], [...`hcsFMrfFFhFp`]]
       const result: string[] = findDuplicateItemsInCompartments(input)
       expect(result.length).toBe(2)
       expect(result).toStrictEqual(['r', 'p'])
@@ -439,6 +443,84 @@ describe('day03', () => {
       const solution: number = sumOfPrioritiesOfDuplicateItemsInCompartments(parseInput(aoc.puzzleInput))
       console.log('puzzle #1 answer: ', solution)
       expect(solution).toBe(8394)
+    })
+  })
+
+  describe('groupRucksacks', () => {
+    it('gets an empty list of rucksacks and returns no groups', () => {
+      const input = ``
+      const result: Group[] = groupRucksacks(parseInput(input))
+      expect(result.length).toBe(0)
+      expect(result).toStrictEqual([])
+    })
+
+    it('gets a list with one rucksack and returns no groups', () => {
+      const input = `vJrwpWtwJgWrhcsFMMfFFhFp`
+      const result: Group[] = groupRucksacks(parseInput(input))
+      expect(result.length).toBe(0)
+      expect(result).toStrictEqual([])
+    })
+
+    it('gets a list with three rucksacks and returns one group', () => {
+      const input = `vJrwpWtwJgWrhcsFMMfFFhFp
+      jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+      PmmdzqPrVvPwwTWBwg`
+      const result: Group[] = groupRucksacks(parseInput(input))
+      expect(result.length).toBe(1)
+      expect(result).toStrictEqual([{badge: 'r'}])
+    })
+
+    it('gets a list with six rucksacks and returns two groups', () => {
+      const input = `vJrwpWtwJgWrhcsFMMfFFhFp
+      jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+      PmmdzqPrVvPwwTWBwg
+      wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+      ttgJtRGJQctTZtZT
+      CrZsJsPPZsGzwwsLwLmpwMDw`
+      const result: Group[] = groupRucksacks(parseInput(input))
+      expect(result.length).toBe(2)
+      expect(result).toStrictEqual([{badge: 'r'}, {badge: 'Z'}])
+    })
+  })
+
+  describe('sumOfPrioritiesOfAllBadges', () => {
+    it('gets an empty list of rucksacks and returns 0', () => {
+      const input = ``
+      const result: number = sumOfPrioritiesOfAllBadges(parseInput(input))
+      expect(result).toBe(0)
+    })
+
+    it('gets a list with one rucksack and returns 0', () => {
+      const input = `vJrwpWtwJgWrhcsFMMfFFhFp`
+      const result: number = sumOfPrioritiesOfAllBadges(parseInput(input))
+      expect(result).toBe(0)
+    })
+
+    it('gets a list with three rucksacks and returns 18', () => {
+      const input = `vJrwpWtwJgWrhcsFMMfFFhFp
+      jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+      PmmdzqPrVvPwwTWBwg`
+      const result: number = sumOfPrioritiesOfAllBadges(parseInput(input))
+      expect(result).toBe(18)
+    })
+
+    it('gets a list with six rucksacks and returns 70', () => {
+      const input = `vJrwpWtwJgWrhcsFMMfFFhFp
+      jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+      PmmdzqPrVvPwwTWBwg
+      wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+      ttgJtRGJQctTZtZT
+      CrZsJsPPZsGzwwsLwLmpwMDw`
+      const result: number = sumOfPrioritiesOfAllBadges(parseInput(input))
+      expect(result).toBe(70)
+    })
+  })
+
+  describe('solves puzzle #2', () => {
+    it('gets the puzzle rucksacks as input and returns the total priority of all badges', () => {
+      const solution: number = sumOfPrioritiesOfAllBadges(parseInput(aoc.puzzleInput))
+      console.log('puzzle #2 answer: ', solution)
+      expect(solution).toBe(2413)
     })
   })
 })

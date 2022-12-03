@@ -1,4 +1,4 @@
-interface Rucksack {
+export interface Rucksack {
   compartments: string[][]
 }
 
@@ -66,6 +66,39 @@ export function sumOfPrioritiesOfDuplicateItemsInCompartments(rucksacks: Rucksac
         result += duplicatesInCompartment.map(duplicate => priorityOfItem(duplicate)).reduce((sum, current) => sum + current)
       }
     })
+  }
+  return result
+}
+
+export interface Group {
+  badge: string
+}
+
+export function groupRucksacks(rucksacks: Rucksack[]): Group[] {
+  const result: Group[] = []
+  if (rucksacks?.length > 0 && rucksacks.length % 3 === 0) {
+    const chunkSize = 3
+    for (let i = 0; i < rucksacks.length; i += chunkSize) {
+      const chunk = rucksacks.slice(i, i + chunkSize)
+      
+      const combinedCompartments = chunk.map((rucksack) => [...rucksack.compartments[0], ...rucksack.compartments[1]])
+      const duplicatesInFirstTwo = findDuplicateItemsInCompartments(combinedCompartments.slice(0, 2))
+      const badge = findDuplicateItemsInCompartments([duplicatesInFirstTwo, combinedCompartments[2]])
+      if (badge.length !== 1) {
+        console.error('Failed to find one common badge in current chunk!', JSON.stringify(chunk))        
+      } else {
+        result.push({badge: badge[0]})
+      }
+    }
+  }
+  return result
+}
+
+export function sumOfPrioritiesOfAllBadges(rucksacks: Rucksack[]): number {
+  let result = 0
+  if (rucksacks?.length > 0 && rucksacks.length % 3 === 0) {
+    const groups = groupRucksacks(rucksacks)
+    result = groups.map((group) => priorityOfItem(group.badge)).reduce((sum, current) => sum + current)
   }
   return result
 }
