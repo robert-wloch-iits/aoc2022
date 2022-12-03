@@ -1,3 +1,5 @@
+import {parseInput} from '@/aoc2022/utils'
+
 export enum RockPaperScissorsOpponentType {
   A = 1,
   B = 2,
@@ -51,23 +53,18 @@ export function calculateStrategyScore(choiceOfOpponent: RockPaperScissorsOppone
   return result
 }
 
+function createStrategyType(chunk: string): StrategyType {
+  const [choiceOfOpponentString, responseString] = chunk ? chunk.split(' ') : []
+  const choiceOfOpponent = RockPaperScissorsOpponentType[choiceOfOpponentString as keyof typeof RockPaperScissorsOpponentType]
+  const response = RockPaperScissorsResponseType[responseString as keyof typeof RockPaperScissorsResponseType]
+  const score = calculateStrategyScore(choiceOfOpponent, response)
+
+  return {choiceOfOpponent, response, score}
+}
+
 export function parseStrategies(input: string): StrategyType[] {
-  const result: StrategyType[] = []
-  const inputLinesArray = input?.trim() ? input.trim().split('\n') : []
-  
-  if (inputLinesArray?.length > 0) {
-    inputLinesArray.forEach(inputLine => {
-      const [choiceOfOpponentString, responseString] = inputLine?.trim() ? inputLine.trim().split(' ') : []
-      const choiceOfOpponent = RockPaperScissorsOpponentType[choiceOfOpponentString as keyof typeof RockPaperScissorsOpponentType]
-      const response = RockPaperScissorsResponseType[responseString as keyof typeof RockPaperScissorsResponseType]
-
-      const score = calculateStrategyScore(choiceOfOpponent, response)
-
-      result.push({choiceOfOpponent, response, score})
-    });
-
-  }
-  return result
+  const strategies = parseInput<StrategyType>(input, createStrategyType)
+  return strategies
 }
 
 export function findStrategicResponseOnChoiceOfOpponent(choiceOfOpponent: RockPaperScissorsOpponentType,  responseStrategy: RockPaperScissorsResponseStrategyType): RockPaperScissorsResponseType {
@@ -91,23 +88,19 @@ export function findStrategicResponseOnChoiceOfOpponent(choiceOfOpponent: RockPa
   return strategyMap[responseStrategy][choiceOfOpponent]
 }
 
+function createResponseStrategyType(chunk: string): ResponseStrategyType {
+  const [choiceOfOpponentString, responseStrategyString] = chunk ? chunk.split(' ') : []
+  const choiceOfOpponent = RockPaperScissorsOpponentType[choiceOfOpponentString as keyof typeof RockPaperScissorsOpponentType]
+  const responseStrategy = RockPaperScissorsResponseStrategyType[responseStrategyString as keyof typeof RockPaperScissorsResponseStrategyType]
+
+  const response = findStrategicResponseOnChoiceOfOpponent(choiceOfOpponent, responseStrategy)
+  const score = calculateStrategyScore(choiceOfOpponent, response)
+
+  return {choiceOfOpponent, responseStrategy, response, score}
+}
+
 export function parseResponseStrategies(input: string): ResponseStrategyType[] {
-  const result: ResponseStrategyType[] = []
-  const inputLinesArray = input?.trim() ? input.trim().split('\n') : []
-  
-  if (inputLinesArray?.length > 0) {
-    inputLinesArray.forEach(inputLine => {
-      const [choiceOfOpponentString, responseStrategyString] = inputLine?.trim() ? inputLine.trim().split(' ') : []
-      const choiceOfOpponent = RockPaperScissorsOpponentType[choiceOfOpponentString as keyof typeof RockPaperScissorsOpponentType]
-      const responseStrategy = RockPaperScissorsResponseStrategyType[responseStrategyString as keyof typeof RockPaperScissorsResponseStrategyType]
-
-      const response = findStrategicResponseOnChoiceOfOpponent(choiceOfOpponent, responseStrategy)
-      const score = calculateStrategyScore(choiceOfOpponent, response)
-
-      result.push({choiceOfOpponent, responseStrategy, response, score})
-    });
-
-  }
+  const result = parseInput<ResponseStrategyType>(input, createResponseStrategyType)
   return result
 }
 

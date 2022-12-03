@@ -2,7 +2,7 @@ import {describe, it, expect} from 'vitest'
 import {
   splitInTwoHalves,
   priorityOfItem,
-  parseInput,
+  parseRucksacks,
   findDuplicateItemsInCompartments,
   sumOfPrioritiesOfDuplicateItemsInCompartments,
   Rucksack,
@@ -350,9 +350,9 @@ describe('day03', () => {
     )
   })
 
-  describe('parseInput', () => {
+  describe('parseRucksacks', () => {
     it('gets an empty list as input and returns no rucksacks', () => {
-      const result: Rucksack[] = parseInput('')
+      const result: Rucksack[] = parseRucksacks('')
       expect(result.length).toBe(0)
       expect(result).toStrictEqual([])
     })
@@ -361,7 +361,7 @@ describe('day03', () => {
       const input = `vJrwpWtwJgWrhcsFMMfFFhFp`
       const expectedFirstHalf = [...`vJrwpWtwJgWr`]
       const expectedSecondHalf = [...`hcsFMMfFFhFp`]
-      const result: Rucksack[] = parseInput(input)
+      const result: Rucksack[] = parseRucksacks(input)
       
       expect(result.length).toBe(1)
       expect(result).toStrictEqual([
@@ -374,7 +374,7 @@ describe('day03', () => {
       jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL`
       const expectedFirstHalves = [[...`vJrwpWtwJgWr`], [...`jqHRNqRjqzjGDLGL`]]
       const expectedSecondHalves = [[...`hcsFMMfFFhFp`], [...`rsFMfFZSrLrFZsSL`]]
-      const result: Rucksack[] = parseInput(input)
+      const result: Rucksack[] = parseRucksacks(input)
       
       expect(result.length).toBe(2)
       expect(result).toStrictEqual([
@@ -416,13 +416,13 @@ describe('day03', () => {
 
   describe('sumOfPrioritiesOfDuplicateItemsInCompartments', () => {
     it('gets an empty list as input and returns 0', () => {
-      const result = sumOfPrioritiesOfDuplicateItemsInCompartments(parseInput(''))
+      const result = sumOfPrioritiesOfDuplicateItemsInCompartments(parseRucksacks(''))
       expect(result).toBe(0)
     })
 
     it('gets a list with one entry as input and returns 16', () => {
       const input = `vJrwpWtwJgWrhcsFMMfFFhFp`
-      const result = sumOfPrioritiesOfDuplicateItemsInCompartments(parseInput(input))
+      const result = sumOfPrioritiesOfDuplicateItemsInCompartments(parseRucksacks(input))
       expect(result).toBe(16)
     })
 
@@ -433,14 +433,14 @@ describe('day03', () => {
       wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
       ttgJtRGJQctTZtZT
       CrZsJsPPZsGzwwsLwLmpwMDw`
-      const result = sumOfPrioritiesOfDuplicateItemsInCompartments(parseInput(input))
+      const result = sumOfPrioritiesOfDuplicateItemsInCompartments(parseRucksacks(input))
       expect(result).toBe(157)
     })
   })
 
   describe('solves puzzle #1', () => {
     it('gets the puzzle rucksacks as input and returns the total priority of duplicates', () => {
-      const solution: number = sumOfPrioritiesOfDuplicateItemsInCompartments(parseInput(aoc.puzzleInput))
+      const solution: number = sumOfPrioritiesOfDuplicateItemsInCompartments(parseRucksacks(aoc.puzzleInput))
       console.log('puzzle #1 answer: ', solution)
       expect(solution).toBe(8394)
     })
@@ -449,14 +449,14 @@ describe('day03', () => {
   describe('groupRucksacks', () => {
     it('gets an empty list of rucksacks and returns no groups', () => {
       const input = ``
-      const result: Group[] = groupRucksacks(parseInput(input))
+      const result: Group[] = groupRucksacks(parseRucksacks(input))
       expect(result.length).toBe(0)
       expect(result).toStrictEqual([])
     })
 
     it('gets a list with one rucksack and returns no groups', () => {
       const input = `vJrwpWtwJgWrhcsFMMfFFhFp`
-      const result: Group[] = groupRucksacks(parseInput(input))
+      const result: Group[] = groupRucksacks(parseRucksacks(input))
       expect(result.length).toBe(0)
       expect(result).toStrictEqual([])
     })
@@ -465,7 +465,7 @@ describe('day03', () => {
       const input = `vJrwpWtwJgWrhcsFMMfFFhFp
       jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
       PmmdzqPrVvPwwTWBwg`
-      const result: Group[] = groupRucksacks(parseInput(input))
+      const result: Group[] = groupRucksacks(parseRucksacks(input))
       expect(result.length).toBe(1)
       expect(result).toStrictEqual([{badge: 'r'}])
     })
@@ -477,7 +477,7 @@ describe('day03', () => {
       wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
       ttgJtRGJQctTZtZT
       CrZsJsPPZsGzwwsLwLmpwMDw`
-      const result: Group[] = groupRucksacks(parseInput(input))
+      const result: Group[] = groupRucksacks(parseRucksacks(input))
       expect(result.length).toBe(2)
       expect(result).toStrictEqual([{badge: 'r'}, {badge: 'Z'}])
     })
@@ -486,13 +486,13 @@ describe('day03', () => {
   describe('sumOfPrioritiesOfAllBadges', () => {
     it('gets an empty list of rucksacks and returns 0', () => {
       const input = ``
-      const result: number = sumOfPrioritiesOfAllBadges(parseInput(input))
+      const result: number = sumOfPrioritiesOfAllBadges(parseRucksacks(input))
       expect(result).toBe(0)
     })
 
     it('gets a list with one rucksack and returns 0', () => {
       const input = `vJrwpWtwJgWrhcsFMMfFFhFp`
-      const result: number = sumOfPrioritiesOfAllBadges(parseInput(input))
+      const result: number = sumOfPrioritiesOfAllBadges(parseRucksacks(input))
       expect(result).toBe(0)
     })
 
@@ -500,7 +500,7 @@ describe('day03', () => {
       const input = `vJrwpWtwJgWrhcsFMMfFFhFp
       jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
       PmmdzqPrVvPwwTWBwg`
-      const result: number = sumOfPrioritiesOfAllBadges(parseInput(input))
+      const result: number = sumOfPrioritiesOfAllBadges(parseRucksacks(input))
       expect(result).toBe(18)
     })
 
@@ -511,14 +511,14 @@ describe('day03', () => {
       wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
       ttgJtRGJQctTZtZT
       CrZsJsPPZsGzwwsLwLmpwMDw`
-      const result: number = sumOfPrioritiesOfAllBadges(parseInput(input))
+      const result: number = sumOfPrioritiesOfAllBadges(parseRucksacks(input))
       expect(result).toBe(70)
     })
   })
 
   describe('solves puzzle #2', () => {
     it('gets the puzzle rucksacks as input and returns the total priority of all badges', () => {
-      const solution: number = sumOfPrioritiesOfAllBadges(parseInput(aoc.puzzleInput))
+      const solution: number = sumOfPrioritiesOfAllBadges(parseRucksacks(aoc.puzzleInput))
       console.log('puzzle #2 answer: ', solution)
       expect(solution).toBe(2413)
     })

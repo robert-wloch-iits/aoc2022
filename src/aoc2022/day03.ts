@@ -1,3 +1,5 @@
+import {parseInput} from '@/aoc2022/utils'
+
 export interface Rucksack {
   compartments: string[][]
 }
@@ -32,14 +34,12 @@ export function priorityOfItem(input: string): number {
   return result
 }
 
-export function parseInput(input: string): Rucksack[] {
-  const inputAsArray = input?.trim() ? input.trim().split('\n') : []
-  const result: Rucksack[] = []
-  if (inputAsArray?.length > 0) {
-    inputAsArray.forEach(contentsAsString => {
-      result.push({compartments: splitInTwoHalves([...contentsAsString.trim()])})
-    });
-  }
+function createRucksack(chunk: string): Rucksack {
+  return {compartments: splitInTwoHalves([...chunk])}
+}
+
+export function parseRucksacks(input: string): Rucksack[] {
+  const result = parseInput<Rucksack>(input, createRucksack)
   return result
 }
 

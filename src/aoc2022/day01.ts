@@ -1,34 +1,28 @@
+import {parseInput} from '@/aoc2022/utils'
+
+type ElfChunkType = {
+  caloriesOfElf: number[]
+}
+function createElfChunkType(chunk: string): ElfChunkType {
+  return {
+    caloriesOfElf: parseInput<number>(chunk, (element: string) => +element)
+  }
+}
+
 export type Elf = {
   calories: number[]
   totalCalories: number
 }
+function createElf(chunk: string): Elf {
+  const elfChunk = createElfChunkType(chunk)
+  return {
+    calories: elfChunk.caloriesOfElf,
+    totalCalories: elfChunk.caloriesOfElf.reduce((sum, current) => sum + current),
+  }
+}
 
 export function convertInputToElves(input: string): Elf[] {
-  const inputAsArray = input?.trim() ? input.trim().split('\n') : []
-  const result: Elf[] = []
-
-  if (inputAsArray.length) {
-    let calories: number[] = []
-    inputAsArray.forEach((inputLine) => {
-      if (+inputLine) {
-        calories.push(+inputLine)
-      } else {
-        result.push({
-          calories,
-          totalCalories: calories.reduce((sum, current) => sum + current),
-        })
-        calories = []
-      }
-    })
-    if (calories.length > 0) {
-      result.push({
-        calories,
-        totalCalories: calories.reduce((sum, current) => sum + current),
-      })
-      calories = []
-    }
-  }
-
+  const result: Elf[] = parseInput<Elf>(input, createElf, '\n\n')
   return result
 }
 
