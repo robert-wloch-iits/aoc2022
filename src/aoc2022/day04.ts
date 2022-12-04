@@ -36,3 +36,11 @@ export function parseAssignmentPairs(input: string): AssignmentPairType[] {
   const result: AssignmentPairType[] = parseInput<AssignmentPairType>(input, createAssignmentPairType)
   return result
 }
+
+export function countFullyContainedAssignmentPairs(assignmentPairs: AssignmentPairType[]): number {
+  let result = 0
+  if (assignmentPairs?.length > 0) {
+    result = assignmentPairs.filter(isContainingOtherAssignmentFully).length
+  }
+  return result
+}
