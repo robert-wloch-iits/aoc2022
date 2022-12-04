@@ -17,3 +17,17 @@ export function createAssignmentPairType(assignmentPairChunk: string): Assignmen
   const assignmentjobPairs = parseInput<AssignmentType>(assignmentPairChunk, createAssignmentType, ',')
   return {first:assignmentjobPairs[0], second:assignmentjobPairs[1]}
 }
+
+export function isContainingOtherAssignmentFully(assignmentPair: AssignmentPairType): boolean {
+  let result = false
+  if (
+    assignmentPair.first?.startSection !== undefined &&
+    assignmentPair.first.endSection !== undefined &&
+    assignmentPair.second?.startSection !== undefined &&
+    assignmentPair.second.endSection !== undefined) {
+      const isFirstFullyContainedInSecond = assignmentPair.first.startSection >= assignmentPair.second.startSection && assignmentPair.first.endSection <= assignmentPair.second.endSection
+      const isSecondFullyContainedInFirst = assignmentPair.second.startSection >= assignmentPair.first.startSection && assignmentPair.second.endSection <= assignmentPair.first.endSection
+      result = isFirstFullyContainedInSecond || isSecondFullyContainedInFirst
+    }
+  return result
+}
