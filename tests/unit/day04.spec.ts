@@ -8,6 +8,7 @@ import {
   isContainingOtherAssignmentFully,
   parseAssignmentPairs,
   countFullyContainedAssignmentPairs,
+  isOverlappingOtherAssignment,
 } from '@/aoc2022/day04'
 
 const aoc = {
@@ -1249,6 +1250,61 @@ describe('day04', () => {
       const solution: number = countFullyContainedAssignmentPairs(parseAssignmentPairs(aoc.puzzleInput))
       console.log('puzzle #1 answer: ', solution)
       expect(solution).toBe(494)
+    })
+  })
+
+
+  describe('isOverlappingOtherAssignment', () => {
+    it('gets an empty assignment pair and returns false', () => {
+      const input: AssignmentPairType = {
+        first: undefined,
+        second: undefined
+      }
+      expect(isOverlappingOtherAssignment(input)).toBeFalsy()
+    })
+
+    it('gets a partial assignment pair and returns false', () => {
+      const input: AssignmentPairType = {
+        first: {startSection: 2, endSection: 4},
+        second: {startSection: undefined, endSection: undefined}
+      }
+      expect(isOverlappingOtherAssignment(input)).toBeFalsy()
+    })
+
+    const testDataFirstOverlapsSecond = [
+      {startSection: 2, endSection: 4},
+      {startSection: 4, endSection: 4},
+      {startSection: 4, endSection: 6},
+      {startSection: 4, endSection: 8},
+      {startSection: 8, endSection: 8},
+      {startSection: 7, endSection: 8},
+      {startSection: 5, endSection: 7},
+      {startSection: 7, endSection: 7},
+    ]
+    it.each(testDataFirstOverlapsSecond)('gets an assignment pair where the first ($startSection-$endSection) is overlapping the second and returns true', ({startSection, endSection}) => {
+      const input: AssignmentPairType = {
+        first: {startSection, endSection},
+        second: {startSection: 4, endSection: 8}
+      }
+      expect(isOverlappingOtherAssignment(input)).toBeTruthy()
+    })
+
+    const testDataSecondOverlapsFirst = [
+      {startSection: 4, endSection: 4},
+      {startSection: 4, endSection: 6},
+      {startSection: 4, endSection: 8},
+      {startSection: 8, endSection: 8},
+      {startSection: 7, endSection: 8},
+      {startSection: 5, endSection: 7},
+      {startSection: 7, endSection: 7},
+      {startSection: 8, endSection: 12},
+    ]
+    it.each(testDataSecondOverlapsFirst)('gets an assignment pair where the second ($startSection-$endSection) is overlapping the first and returns true', ({startSection, endSection}) => {
+      const input: AssignmentPairType = {
+        first: {startSection: 4, endSection: 8},
+        second: {startSection, endSection}
+      }
+      expect(isOverlappingOtherAssignment(input)).toBeTruthy()
     })
   })
 })

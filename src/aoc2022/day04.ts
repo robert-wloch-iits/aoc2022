@@ -44,3 +44,17 @@ export function countFullyContainedAssignmentPairs(assignmentPairs: AssignmentPa
   }
   return result
 }
+
+export function isOverlappingOtherAssignment(assignmentPair: AssignmentPairType): boolean {
+  let result = false
+  if (
+    assignmentPair.first?.startSection !== undefined &&
+    assignmentPair.first.endSection !== undefined &&
+    assignmentPair.second?.startSection !== undefined &&
+    assignmentPair.second.endSection !== undefined) {
+      const isFirstOverlappingSecond = assignmentPair.first.endSection >= assignmentPair.second.startSection
+      const isSecondOverlappingFirst = assignmentPair.second.startSection <= assignmentPair.first.endSection
+      result = isFirstOverlappingSecond || isSecondOverlappingFirst
+    }
+  return result
+}
