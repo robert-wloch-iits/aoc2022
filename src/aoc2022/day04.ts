@@ -31,3 +31,8 @@ export function isContainingOtherAssignmentFully(assignmentPair: AssignmentPairT
     }
   return result
 }
+
+export function parseAssignmentPairs(input: string): AssignmentPairType[] {
+  const result: AssignmentPairType[] = parseInput<AssignmentPairType>(input, createAssignmentPairType)
+  return result
+}

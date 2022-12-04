@@ -6,6 +6,7 @@ import {
   createAssignmentPairType,
   AssignmentPairType,
   isContainingOtherAssignmentFully,
+  parseAssignmentPairs,
 } from '@/aoc2022/day04'
 
 describe('day04', () => {
@@ -121,6 +122,64 @@ describe('day04', () => {
         second: {startSection, endSection}
       }
       expect(isContainingOtherAssignmentFully(input)).toBeTruthy()
+    })
+  })
+
+  describe('parseAssignmentPairs', () => {
+    it('gets an empty list and returns no assignment pairs', () => {
+      const input = ``
+      const result: AssignmentPairType[] = parseAssignmentPairs(input)
+      const expected: AssignmentPairType[] = []
+      expect(result).toStrictEqual(expected)
+    })
+
+    it('gets a list with an assignment pair and returns one assignment pair', () => {
+      const input = `2-4,6-8`
+      const result: AssignmentPairType[] = parseAssignmentPairs(input)
+      const expected: AssignmentPairType[] = [
+        {
+          first: {startSection: 2, endSection: 4},
+          second: {startSection: 6, endSection: 8}
+        },
+      ]
+      expect(result).toStrictEqual(expected)
+    })
+
+    it('gets a list with six assignment pairs and returns six assignment pairs', () => {
+      const input = `2-4,6-8
+      2-3,4-5
+      5-7,7-9
+      2-8,3-7
+      6-6,4-6
+      2-6,4-8`
+      const result: AssignmentPairType[] = parseAssignmentPairs(input)
+      const expected: AssignmentPairType[] = [
+        {
+          first: {startSection: 2, endSection: 4},
+          second: {startSection: 6, endSection: 8}
+        },
+        {
+          first: {startSection: 2, endSection: 3},
+          second: {startSection: 4, endSection: 5}
+        },
+        {
+          first: {startSection: 5, endSection: 7},
+          second: {startSection: 7, endSection: 9}
+        },
+        {
+          first: {startSection: 2, endSection: 8},
+          second: {startSection: 3, endSection: 7}
+        },
+        {
+          first: {startSection: 6, endSection: 6},
+          second: {startSection: 4, endSection: 6}
+        },
+        {
+          first: {startSection: 2, endSection: 6},
+          second: {startSection: 4, endSection: 8}
+        },
+      ]
+      expect(result).toStrictEqual(expected)
     })
   })
 })
