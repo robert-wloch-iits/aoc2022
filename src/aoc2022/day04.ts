@@ -52,9 +52,15 @@ export function isOverlappingOtherAssignment(assignmentPair: AssignmentPairType)
     assignmentPair.first.endSection !== undefined &&
     assignmentPair.second?.startSection !== undefined &&
     assignmentPair.second.endSection !== undefined) {
-      const isFirstOverlappingSecond = assignmentPair.first.endSection >= assignmentPair.second.startSection
-      const isSecondOverlappingFirst = assignmentPair.second.startSection <= assignmentPair.first.endSection
-      result = isFirstOverlappingSecond || isSecondOverlappingFirst
+      result = Math.max(assignmentPair.first.startSection, assignmentPair.second.startSection) <= Math.min(assignmentPair.first.endSection, assignmentPair.second.endSection)
     }
+  return result
+}
+
+export function countOverlappingAssignmentPairs(assignmentPairs: AssignmentPairType[]): number {
+  let result = 0
+  if (assignmentPairs?.length > 0) {
+    result = assignmentPairs.filter(isOverlappingOtherAssignment).length
+  }
   return result
 }

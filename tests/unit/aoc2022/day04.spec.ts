@@ -9,6 +9,7 @@ import {
   parseAssignmentPairs,
   countFullyContainedAssignmentPairs,
   isOverlappingOtherAssignment,
+  countOverlappingAssignmentPairs,
 } from '@/aoc2022/day04'
 
 const aoc = {
@@ -1204,7 +1205,7 @@ describe('day04', () => {
       expect(countFullyContainedAssignmentPairs(input)).toBe(0)
     })
 
-    it('gets a list with one overlapping assignment pair and returns 1', () => {
+    it('gets a list with one fully contained assignment pair and returns 1', () => {
       const input: AssignmentPairType[] = [
         {
           first: {startSection: 4, endSection: 4},
@@ -1214,7 +1215,7 @@ describe('day04', () => {
       expect(countFullyContainedAssignmentPairs(input)).toBe(1)
     })
 
-    it('gets a list with six assignment pairs where two are overlapping and returns 2', () => {
+    it('gets a list with six assignment pairs where two are fully contained and returns 2', () => {
       const input: AssignmentPairType[] = [
         {
           first: {startSection: 2, endSection: 4},
@@ -1253,7 +1254,6 @@ describe('day04', () => {
     })
   })
 
-
   describe('isOverlappingOtherAssignment', () => {
     it('gets an empty assignment pair and returns false', () => {
       const input: AssignmentPairType = {
@@ -1271,6 +1271,30 @@ describe('day04', () => {
       expect(isOverlappingOtherAssignment(input)).toBeFalsy()
     })
 
+    const testDataFirstDoesNotOverlapSecond = [
+      {startSection: 2, endSection: 3},
+      {startSection: 10, endSection: 12},
+    ]
+    it.each(testDataFirstDoesNotOverlapSecond)('gets an assignment pair where the first ($startSection-$endSection) is NOT overlapping the second and returns false', ({startSection, endSection}) => {
+      const input: AssignmentPairType = {
+        first: {startSection, endSection},
+        second: {startSection: 4, endSection: 8}
+      }
+      expect(isOverlappingOtherAssignment(input)).toBeFalsy()
+    })
+
+    const testDataSecondDoesNotOverlapFirst = [
+      {startSection: 2, endSection: 3},
+      {startSection: 10, endSection: 12},
+    ]
+    it.each(testDataSecondDoesNotOverlapFirst)('gets an assignment pair where the second ($startSection-$endSection) is NOT overlapping the first and returns false', ({startSection, endSection}) => {
+      const input: AssignmentPairType = {
+        first: {startSection: 4, endSection: 8},
+        second: {startSection, endSection}
+      }
+      expect(isOverlappingOtherAssignment(input)).toBeFalsy()
+    })
+
     const testDataFirstOverlapsSecond = [
       {startSection: 2, endSection: 4},
       {startSection: 4, endSection: 4},
@@ -1281,7 +1305,7 @@ describe('day04', () => {
       {startSection: 5, endSection: 7},
       {startSection: 7, endSection: 7},
     ]
-    it.each(testDataFirstOverlapsSecond)('gets an assignment pair where the first ($startSection-$endSection) is overlapping the second and returns true', ({startSection, endSection}) => {
+    it.each(testDataFirstOverlapsSecond)('gets an assignment pair where the first ($startSection-$endSection) is overlapping the second (4-8) and returns true', ({startSection, endSection}) => {
       const input: AssignmentPairType = {
         first: {startSection, endSection},
         second: {startSection: 4, endSection: 8}
@@ -1299,12 +1323,73 @@ describe('day04', () => {
       {startSection: 7, endSection: 7},
       {startSection: 8, endSection: 12},
     ]
-    it.each(testDataSecondOverlapsFirst)('gets an assignment pair where the second ($startSection-$endSection) is overlapping the first and returns true', ({startSection, endSection}) => {
+    it.each(testDataSecondOverlapsFirst)('gets an assignment pair where the second ($startSection-$endSection) is overlapping the first (4-8) and returns true', ({startSection, endSection}) => {
       const input: AssignmentPairType = {
         first: {startSection: 4, endSection: 8},
         second: {startSection, endSection}
       }
       expect(isOverlappingOtherAssignment(input)).toBeTruthy()
+    })
+  })
+
+  describe('countOverlappingAssignmentPairs', () => {
+    it('gets an empty list of assignment pairs and returns 0', () => {
+      const input: AssignmentPairType[] = []
+      expect(countOverlappingAssignmentPairs(input)).toBe(0)
+    })
+
+    it('gets a list with a non-overlapping assignment pair and returns 0', () => {
+      const input: AssignmentPairType[] = [
+        {
+          first: {startSection: 2, endSection: 4},
+          second: {startSection: 6, endSection: 8}
+        },
+      ]
+      expect(countOverlappingAssignmentPairs(input)).toBe(0)
+    })
+
+    it('gets a list with one overlapping assignment pair and returns 1', () => {
+      const input: AssignmentPairType[] = [
+        {
+          first: {startSection: 5, endSection: 7},
+          second: {startSection: 7, endSection: 9}
+        },
+      ]
+      expect(countOverlappingAssignmentPairs(input)).toBe(1)
+    })
+
+    it('gets a list with six assignment pairs where two are overlapping and returns 4', () => {
+      const input: AssignmentPairType[] = [
+        {
+          first: {startSection: 2, endSection: 4},
+          second: {startSection: 6, endSection: 8}
+        },
+        {
+          first: {startSection: 5, endSection: 7},
+          second: {startSection: 7, endSection: 9}
+        },
+        {
+          first: {startSection: 2, endSection: 8},
+          second: {startSection: 3, endSection: 7}
+        },
+        {
+          first: {startSection: 6, endSection: 6},
+          second: {startSection: 4, endSection: 6}
+        },
+        {
+          first: {startSection: 2, endSection: 6},
+          second: {startSection: 4, endSection: 8}
+        },
+      ]
+      expect(countOverlappingAssignmentPairs(input)).toBe(4)
+    })
+  })
+
+  describe('solves puzzle #2', () => {
+    it('gets the assignment pairs as input and returns the number of pairs overlapping one of the other', () => {
+      const solution: number = countOverlappingAssignmentPairs(parseAssignmentPairs(aoc.puzzleInput))
+      console.log('puzzle #2 answer: ', solution)
+      expect(solution).toBe(833)
     })
   })
 })
