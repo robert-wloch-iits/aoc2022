@@ -1,4 +1,4 @@
-export function findStartOfPacketMarker(input: string): number {
+export function findStartOfSequenceMarker(input: string, bufferLength = 4): number {
   let result = -1
   const markerBuffer: string[] = []
 
@@ -10,7 +10,7 @@ export function findStartOfPacketMarker(input: string): number {
       markerBuffer.splice(0, index)
     }
     markerBuffer.push(symbol)
-  if (markerBuffer.length === 4) {
+  if (markerBuffer.length === bufferLength) {
       result = index + 1
       index = input.length
     }
