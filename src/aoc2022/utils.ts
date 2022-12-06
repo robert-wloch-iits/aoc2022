@@ -32,3 +32,27 @@ export function transposeReversedLines(input: string, columnWidth = 4, columnMar
   }
   return result
 }
+
+export function uniqueStringMatcher(nextSymbol: string, matchBuffer: string[]) {
+  if (matchBuffer.includes(nextSymbol)) {
+    const index = matchBuffer.findIndex((e) => e === nextSymbol) + 1
+    matchBuffer.splice(0, index)
+  }
+  matchBuffer.push(nextSymbol)
+}
+
+export function findStartOfSequence<S>(input: S[], matcher: (nextSymbol: S, matchBuffer: S[]) => void, matchBufferLength = 4, offsetToMatchIndex = matchBufferLength): number {
+  let result = -1
+  const startOfSequenceIndexOffset = 1 - matchBufferLength + offsetToMatchIndex
+  const matchBuffer: S[] = []
+
+  for (let index = 0; index < input.length; index++) {
+    const nextSymbol = input[index]
+    matcher(nextSymbol, matchBuffer)
+  if (matchBuffer.length === matchBufferLength) {
+      result = index + startOfSequenceIndexOffset
+      index = input.length
+    }
+  }
+  return result
+}

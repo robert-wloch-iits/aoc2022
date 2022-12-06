@@ -1,5 +1,5 @@
 import {describe, it, expect} from 'vitest'
-import {parseInput, parseInputWithoutTrim, transposeReversedLines} from '@/aoc2022/utils'
+import {parseInput, parseInputWithoutTrim, transposeReversedLines, uniqueStringMatcher, findStartOfSequence} from '@/aoc2022/utils'
 
 type TestType = {
   value: string
@@ -122,6 +122,47 @@ C`
  2 |[M]|[C]|[D]
  3|[P]|   |   `
       expect(result).toBe(expected)
+    })
+  })
+
+  describe('uniqueStringMatcher', () => {
+    const testData = [
+      {nextSymbol: '', matchBuffer: [], expectedMatchBuffer: ['']},
+      {nextSymbol: 'a', matchBuffer: [], expectedMatchBuffer: ['a']},
+      {nextSymbol: 'a', matchBuffer: ['b'], expectedMatchBuffer: ['b', 'a']},
+      {nextSymbol: 'a', matchBuffer: ['b', 'a'], expectedMatchBuffer: ['a']},
+      {nextSymbol: 'a', matchBuffer: ['a'], expectedMatchBuffer: ['a']},
+      {nextSymbol: 'a', matchBuffer: ['b', 'c'], expectedMatchBuffer: ['b', 'c', 'a']},
+    ]
+    it.each(testData)('gets ($nextSymbol, $matchBuffer) as input and returns $expectedMatchBuffer', ({nextSymbol, matchBuffer, expectedMatchBuffer}) => {
+      uniqueStringMatcher(nextSymbol, matchBuffer)
+      expect(matchBuffer).toStrictEqual(expectedMatchBuffer)
+    })
+  })
+
+  describe('findStartOfSequence', () => {
+    describe('for symbol type string', () => {
+      const testDataStartOfSequence = [
+        {input: [...''], matchBufferLength: 4, offsetToMatchIndex: 4, expected: -1},
+        {input: [...'bvw'], matchBufferLength: 4, offsetToMatchIndex: 4, expected: -1},
+        {input: [...'bvwb'], matchBufferLength: 4, offsetToMatchIndex: 4, expected: -1},
+        {input: [...'bvwbjplbgvbhsrlpgdmjqwftvncz'], matchBufferLength: 4, offsetToMatchIndex: 4, expected: 5},
+        {input: [...'nppdvjthqldpwncqszvftbrmjlhg'], matchBufferLength: 4, offsetToMatchIndex: 4, expected: 6},
+        {input: [...'nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg'], matchBufferLength: 4, offsetToMatchIndex: 4, expected: 10},
+        {input: [...'zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw'], matchBufferLength: 4, offsetToMatchIndex: 4, expected: 11},
+        {input: [...'mjqjpqmgbljsphdztnvjfqwrcgsmlb'], matchBufferLength: 14, offsetToMatchIndex: 14, expected: 19},
+        {input: [...'bvwbjplbgvbhsrlpgdmjqwftvncz'], matchBufferLength: 14, offsetToMatchIndex: 14, expected: 23},
+        {input: [...'nppdvjthqldpwncqszvftbrmjlhg'], matchBufferLength: 14, offsetToMatchIndex: 14, expected: 23},
+        {input: [...'nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg'], matchBufferLength: 14, offsetToMatchIndex: 14, expected: 29},
+        {input: [...'zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw'], matchBufferLength: 14, offsetToMatchIndex: 14, expected: 26},
+        {input: [...'bvwbjplbgvbhsrlpgdmjqwftvncz'], matchBufferLength: 4, offsetToMatchIndex: undefined, expected: 5},
+        {input: [...'bvwbjplbgvbhsrlpgdmjqwftvncz'], matchBufferLength: 4, offsetToMatchIndex: 0, expected: 1},
+        {input: [...'mjqjpqmgbljsphdztnvjfqwrcgsmlb'], matchBufferLength: 14, offsetToMatchIndex: undefined, expected: 19},
+        {input: [...'mjqjpqmgbljsphdztnvjfqwrcgsmlb'], matchBufferLength: 14, offsetToMatchIndex: 0, expected: 5},
+      ]
+      it.each(testDataStartOfSequence)('gets "$input" as input and returns $expected as start index of sequence', ({input, matchBufferLength, offsetToMatchIndex, expected}) => {
+        expect(findStartOfSequence<string>(input, uniqueStringMatcher, matchBufferLength, offsetToMatchIndex)).toBe(expected)
+      })
     })
   })
 })
