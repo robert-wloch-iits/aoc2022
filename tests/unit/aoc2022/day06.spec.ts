@@ -10,12 +10,25 @@ const aoc = {
 
 describe('day06', () => {
   describe('findStartOfPacketMarker', () => {
-
     const testData = [
       {input: '', expected: -1},
+      {input: 'bvw', expected: -1},
+      {input: 'bvwb', expected: -1},
+      {input: 'bvwbjplbgvbhsrlpgdmjqwftvncz', expected: 5},
+      {input: 'nppdvjthqldpwncqszvftbrmjlhg', expected: 6},
+      {input: 'nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg', expected: 10},
+      {input: 'zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw', expected: 11},
     ]
     it.each(testData)('gets "$input" as input and returns $expected', ({input, expected}) => {
       expect(findStartOfPacketMarker(input)).toBe(expected)
+    })
+  })
+
+  describe('solves puzzle #1', () => {
+    it('gets symbol sequence of the puzzle as input and returns the number of characters until the first start-of-packet-marker', () => {
+      const solution = findStartOfPacketMarker(aoc.puzzleInput)
+      console.log('puzzle #1 answer: ', solution)
+      expect(solution).toBe(1723)
     })
   })
 })
