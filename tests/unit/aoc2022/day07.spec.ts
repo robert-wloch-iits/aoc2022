@@ -10,6 +10,7 @@ import {
   ShellHistoryType,
   createShellHistoryType,
   executeCommand,
+  addSizeInTreeToRoot,
   parseShellHistoryToFileSystemTree,
 } from '@/aoc2022/day07'
 
@@ -35,13 +36,13 @@ describe('day07', () => {
   describe('createDirectory', () => {
     it('gets an empty string as input and returns a directory with null value as name', () => {
       const result: DirectoryType = createDirectory(``)
-      const expected: DirectoryType = {name: null, entries: []}
+      const expected: DirectoryType = {name: null, entries: [], size: 0}
       expect(result).toStrictEqual(expected)
     })
 
     it('gets a directory string as input and returns directory object with those values', () => {
       const result: DirectoryType = createDirectory(`dir d`)
-      const expected: DirectoryType = {name: 'd', entries: []}
+      const expected: DirectoryType = {name: 'd', entries: [], size: 0}
       expect(result).toStrictEqual(expected)
     })
   })
@@ -62,7 +63,7 @@ describe('day07', () => {
   describe('createShellHistoryType', () => {
     const testData = [
       {input: '14848514 b.txt', expected: {name: 'b.txt', size: 14848514}},
-      {input: 'dir d', expected: {name: 'd', entries: []}},
+      {input: 'dir d', expected: {name: 'd', entries: [], size: 0}},
       {input: '$ ls', expected: {name: 'ls', argument: null}},
       {input: '$ cd d', expected: {name: 'cd', argument: 'd'}},
     ]
@@ -73,9 +74,9 @@ describe('day07', () => {
   })
 
   describe('executeCommand', () => {
-    const dirA: DirectoryType ={name: 'a', entries: []}
-    const dirD: DirectoryType = {name: 'd', entries: [dirA]}
-    const rootDirectory: DirectoryType = {name: '/', entries: [dirD]}
+    const dirA: DirectoryType ={name: 'a', entries: [], size: 0}
+    const dirD: DirectoryType = {name: 'd', entries: [dirA], size: 0}
+    const rootDirectory: DirectoryType = {name: '/', entries: [dirD], size: 0}
     const testData = [
       {name: 'ls', argument: null, options: {rootDirectory, parentDirectories: [rootDirectory]}, expectedOptions: {rootDirectory, parentDirectories: [rootDirectory]}},
 
@@ -93,11 +94,37 @@ describe('day07', () => {
     })
   })
 
+  describe('addSizeInTreeToRoot', () => {
+    it('gets a directory entry and does not change the sizes in the tree to root', () => {
+      const fileB: FileType = {name: 'B', size: 100}
+      const dirA: DirectoryType ={name: 'a', entries: [], size: 0}
+      const dirD: DirectoryType = {name: 'd', entries: [], size: 0}
+      const rootDirectory: DirectoryType = {name: '/', entries: [dirD, fileB], size: 100}
+      const options = {rootDirectory, parentDirectories: [rootDirectory, dirD]}
+      const entry = dirA
+      addSizeInTreeToRoot(entry, options)
+      expect(options).toStrictEqual(options)
+    })
+    
+    it('gets a file entry and changes the sizes in the tree to root', () => {
+      const fileA: FileType = {name: 'A', size: 20}
+      const fileB: FileType = {name: 'B', size: 100}
+      const dirA: DirectoryType ={name: 'a', entries: [], size: 0}
+      const dirD: DirectoryType = {name: 'd', entries: [dirA], size: 0}
+      const rootDirectory: DirectoryType = {name: '/', entries: [dirD, fileB], size: 100}
+      const options = {rootDirectory, parentDirectories: [rootDirectory, dirD, dirA]}
+      const expectedOptions = {rootDirectory, parentDirectories: [{...rootDirectory, size: 120}, {...dirD, size: 20}, {...dirA, size: 20}]}
+      const entry = fileA
+      addSizeInTreeToRoot(entry, options)
+      expect(options).toStrictEqual(expectedOptions)
+    })
+  })
+
   describe('parseShellHistoryToFileSystemTree', () => {
     it('gets an empty string as input and returns an empty file system tree', () => {
       const input = ``
       const result: DirectoryType = parseShellHistoryToFileSystemTree(input)
-      const expected: DirectoryType = {name: '/', entries: []}
+      const expected: DirectoryType = {name: '/', entries: [], size: 0}
       expect(result).toStrictEqual(expected)
     })
 
@@ -131,11 +158,11 @@ describe('day07', () => {
           {name: 'a', entries: [
             {name: 'e', entries: [
               {name: 'i', size: 584},
-            ]},
+            ], size: 584},
             {name: 'f', size: 29116},
             {name: 'g', size: 2557},
             {name: 'h.lst', size: 62596},
-          ]},
+          ], size: 94853},
           {name: 'b.txt', size: 14848514},
           {name: 'c.dat', size: 8504156},
           {name: 'd', entries: [
@@ -143,8 +170,8 @@ describe('day07', () => {
             {name: 'd.log', size: 8033020},
             {name: 'd.ext', size: 5626152},
             {name: 'k', size: 7214296},
-          ]}
-        ]}
+          ], size: 24933642}
+        ], size: 48381165}
       expect(result).toStrictEqual(expected)
     })
   })

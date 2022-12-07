@@ -12,6 +12,7 @@ export function createFile(fileChunk: string): FileType {
 export type DirectoryType = {
   name: string|null
   entries: (FileType|DirectoryType)[]
+  size: number
 }
 type DirectoryOptionsType = {
   rootDirectory: DirectoryType,
@@ -19,7 +20,7 @@ type DirectoryOptionsType = {
 }
 export function createDirectory(directoryChunk: string): DirectoryType {
   const parts = parseInput<string>(directoryChunk, (chunk) => chunk, 'dir ')
-  return {entries: [], name: parts.length > 1 ? parts[1] : null}
+  return {entries: [], name: parts.length > 1 ? parts[1] : null, size: 0}
 }
 
 export type CommandType = {
@@ -59,12 +60,19 @@ export function executeCommand(command: CommandType, options?: DirectoryOptionsT
   }
 }
 
+export function addSizeInTreeToRoot(entry: FileType | DirectoryType, options?: DirectoryOptionsType) {
+  if (options?.parentDirectories) {
+    options.parentDirectories.forEach((d) => d.size += entry.size)
+  }
+}
+
 export type ShellHistoryType = FileType | DirectoryType | CommandType
 function addEntry(entry: FileType | DirectoryType, options?: DirectoryOptionsType) {
   if (options?.parentDirectories) {
     const parent = currentParent(options)
     if (!parent.entries.includes(entry)) {
       parent.entries.push(entry)
+      addSizeInTreeToRoot(entry, options)
     }
   }
 }
@@ -83,7 +91,7 @@ export function createShellHistoryType(shellHistoryChunk: string, options?: Dire
   return result
 }
 export function parseShellHistoryToFileSystemTree(input: string): DirectoryType {
-  const rootDirectory: DirectoryType = {name: '/', entries: []}
+  const rootDirectory: DirectoryType = {name: '/', entries: [], size: 0}
   const options: DirectoryOptionsType = {
     rootDirectory,
     parentDirectories: [rootDirectory]
