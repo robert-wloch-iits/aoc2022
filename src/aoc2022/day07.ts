@@ -100,3 +100,16 @@ export function parseShellHistoryToFileSystemTree(input: string): DirectoryType 
   parseInput<ShellHistoryType, DirectoryOptionsType>(input, createShellHistoryType, '\n', options)
   return rootDirectory
 }
+
+
+export function sumDirectorySizes(directory: DirectoryType, sizeSelectorFn: (size: number) => number): number {
+  let result = sizeSelectorFn(directory.size)
+  if (directory.entries.length > 0) {
+    directory.entries.forEach((entry) => {
+      if (isDirectory(entry)) {
+        result += sumDirectorySizes(entry, sizeSelectorFn)
+      }
+    })
+  }
+  return result
+}
