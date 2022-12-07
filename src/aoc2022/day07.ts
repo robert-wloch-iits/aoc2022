@@ -28,3 +28,20 @@ export function createCommand(commandChunk: string): CommandType {
   const argument = parts.length > 2 ? parts[2] : null
   return {name, argument}
 }
+
+export type ShellHistoryType = FileType | DirectoryType | CommandType
+export function createShellHistoryType(shellHistoryChunk: string): ShellHistoryType {
+  let result: ShellHistoryType
+  if (shellHistoryChunk.startsWith('$ ')) {
+    result = createCommand(shellHistoryChunk)
+  } else if (shellHistoryChunk.startsWith('dir ')) {
+    result = createDirectory(shellHistoryChunk)
+  } else {
+    result = createFile(shellHistoryChunk)
+  }
+  return result
+}
+export function parseShellHistory(input: string): ShellHistoryType[] {
+  const result = parseInput<ShellHistoryType>(input, createShellHistoryType)
+  return result
+}
