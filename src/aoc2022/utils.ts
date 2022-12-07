@@ -1,9 +1,9 @@
-export function parseInput<C>(input: string, typeFactoryFn: (chunk: string) => C, delimiter = '\n'): C[] {
+export function parseInput<C, O = Record<string, unknown>>(input: string, typeFactoryFn: (chunk: string, options?: O) => C, delimiter = '\n', options?: O): C[] {
   const inputChunksArray = input?.trim() ? input.trim().split(delimiter) : []
   const result: C[] = []
   if (inputChunksArray?.length > 0) {
     inputChunksArray.forEach(chunkAsString => {
-      result.push(typeFactoryFn(chunkAsString.trim()))
+      result.push(typeFactoryFn(chunkAsString.trim(), options))
     });
   }
   return result

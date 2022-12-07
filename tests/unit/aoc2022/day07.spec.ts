@@ -9,7 +9,8 @@ import {
   createCommand,
   ShellHistoryType,
   createShellHistoryType,
-  parseShellHistory,
+  executeCommand,
+  parseShellHistoryToFileSystemTree,
 } from '@/aoc2022/day07'
 
 const aoc = {
@@ -71,26 +72,79 @@ describe('day07', () => {
     })
   })
 
-  describe('parseShellHistory', () => {
-    it('gets an empty string as input and returns an empty shell history', () => {
+  describe('executeCommand', () => {
+    const dirA: DirectoryType ={name: 'a', entries: []}
+    const dirD: DirectoryType = {name: 'd', entries: [dirA]}
+    const rootDirectory: DirectoryType = {name: '/', entries: [dirD]}
+    const testData = [
+      {name: 'ls', argument: null, options: {rootDirectory, parentDirectories: [rootDirectory]}, expectedOptions: {rootDirectory, parentDirectories: [rootDirectory]}},
+
+      {name: 'cd', argument: 'd', options: {rootDirectory, parentDirectories: [rootDirectory]}, expectedOptions: {rootDirectory, parentDirectories: [rootDirectory, dirD]}},
+
+      {name: 'cd', argument: 'a', options: {rootDirectory, parentDirectories: [rootDirectory, dirD]}, expectedOptions: {rootDirectory, parentDirectories: [rootDirectory, dirD, dirA]}},
+
+      {name: 'cd', argument: '..', options: {rootDirectory, parentDirectories: [rootDirectory, dirD, dirA]}, expectedOptions: {rootDirectory, parentDirectories: [rootDirectory, dirD]}},
+
+      {name: 'cd', argument: '/', options: {rootDirectory, parentDirectories: [rootDirectory, dirD]}, expectedOptions: {rootDirectory, parentDirectories: [rootDirectory]}},
+    ]
+    it.each(testData)('executes command "$name" with argument "$argument" and it modifies the parentDirectory of the options object as expected', ({name, argument, options, expectedOptions}) => {
+      executeCommand({name, argument}, options)
+      expect(options).toStrictEqual(expectedOptions)
+    })
+  })
+
+  describe('parseShellHistoryToFileSystemTree', () => {
+    it('gets an empty string as input and returns an empty file system tree', () => {
       const input = ``
-      const result: ShellHistoryType[] = parseShellHistory(input)
-      const expected: ShellHistoryType[] = []
+      const result: DirectoryType = parseShellHistoryToFileSystemTree(input)
+      const expected: DirectoryType = {name: '/', entries: []}
       expect(result).toStrictEqual(expected)
     })
 
-    it('gets a list of shell history strings as input and returns a that shell history', () => {
+    it('gets a list of shell history strings as input and returns that file system tree', () => {
       const input = `$ cd /
       $ ls
       dir a
-      14848514 b.txt`
-      const result: ShellHistoryType[] = parseShellHistory(input)
-      const expected: ShellHistoryType[] = [
-        {name: 'cd', argument: '/'},
-        {name: 'ls', argument: null},
-        {name: 'a', entries: []},
-        {name: 'b.txt', size: 14848514},
-      ]
+      14848514 b.txt
+      8504156 c.dat
+      dir d
+      $ cd a
+      $ ls
+      dir e
+      29116 f
+      2557 g
+      62596 h.lst
+      $ cd e
+      $ ls
+      584 i
+      $ cd ..
+      $ cd ..
+      $ cd d
+      $ ls
+      4060174 j
+      8033020 d.log
+      5626152 d.ext
+      7214296 k`
+      const result: DirectoryType = parseShellHistoryToFileSystemTree(input)
+      const expected: DirectoryType =
+        {name: '/', entries: [
+          {name: 'a', entries: [
+            {name: 'e', entries: [
+              {name: 'i', size: 584},
+            ]},
+            {name: 'f', size: 29116},
+            {name: 'g', size: 2557},
+            {name: 'h.lst', size: 62596},
+          ]},
+          {name: 'b.txt', size: 14848514},
+          {name: 'c.dat', size: 8504156},
+          {name: 'd', entries: [
+            {name: 'j', size: 4060174},
+            {name: 'd.log', size: 8033020},
+            {name: 'd.ext', size: 5626152},
+            {name: 'k', size: 7214296},
+          ]}
+        ]}
       expect(result).toStrictEqual(expected)
     })
   })

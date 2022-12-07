@@ -13,6 +13,10 @@ export type DirectoryType = {
   name: string|null
   entries: (FileType|DirectoryType)[]
 }
+type DirectoryOptionsType = {
+  rootDirectory: DirectoryType,
+  parentDirectories: DirectoryType[],
+}
 export function createDirectory(directoryChunk: string): DirectoryType {
   const parts = parseInput<string>(directoryChunk, (chunk) => chunk, 'dir ')
   return {entries: [], name: parts.length > 1 ? parts[1] : null}
@@ -29,19 +33,62 @@ export function createCommand(commandChunk: string): CommandType {
   return {name, argument}
 }
 
+function isDirectory(dir: FileType | DirectoryType): dir is DirectoryType {
+  return (<DirectoryType>dir).entries !== undefined;
+}
+function currentParent(options: DirectoryOptionsType): DirectoryType {
+  return options.parentDirectories.length > 0 ? options.parentDirectories[options.parentDirectories.length - 1] : options.rootDirectory
+}
+export function executeCommand(command: CommandType, options?: DirectoryOptionsType) {
+  if (!options || 'ls' === command.name) return
+
+  if ('cd' === command.name) {
+    if ('..' === command.argument) {
+      if (options.parentDirectories.length > 0) {
+        options.parentDirectories.pop()
+      }
+    } else if ('/' === command.argument) {
+      options.parentDirectories.splice(1)
+    } else {
+      const parent = currentParent(options)
+      const childDirectory = parent.entries.find((d) => isDirectory(d) && d.name === command.argument) as DirectoryType
+      if (childDirectory) {
+        options.parentDirectories.push(childDirectory)
+      }
+    }
+  }
+}
+
 export type ShellHistoryType = FileType | DirectoryType | CommandType
-export function createShellHistoryType(shellHistoryChunk: string): ShellHistoryType {
+function addEntry(entry: FileType | DirectoryType, options?: DirectoryOptionsType) {
+  if (options?.parentDirectories) {
+    const parent = currentParent(options)
+    if (!parent.entries.includes(entry)) {
+      parent.entries.push(entry)
+    }
+  }
+}
+export function createShellHistoryType(shellHistoryChunk: string, options?: DirectoryOptionsType): ShellHistoryType {
   let result: ShellHistoryType
   if (shellHistoryChunk.startsWith('$ ')) {
     result = createCommand(shellHistoryChunk)
+    executeCommand(result, options)
   } else if (shellHistoryChunk.startsWith('dir ')) {
     result = createDirectory(shellHistoryChunk)
+    addEntry(result, options)
   } else {
     result = createFile(shellHistoryChunk)
+    addEntry(result, options)
   }
   return result
 }
-export function parseShellHistory(input: string): ShellHistoryType[] {
-  const result = parseInput<ShellHistoryType>(input, createShellHistoryType)
-  return result
+export function parseShellHistoryToFileSystemTree(input: string): DirectoryType {
+  const rootDirectory: DirectoryType = {name: '/', entries: []}
+  const options: DirectoryOptionsType = {
+    rootDirectory,
+    parentDirectories: [rootDirectory]
+  }
+
+  parseInput<ShellHistoryType, DirectoryOptionsType>(input, createShellHistoryType, '\n', options)
+  return rootDirectory
 }
