@@ -13,6 +13,7 @@ import {
   addSizeInTreeToRoot,
   parseShellHistoryToFileSystemTree,
   sumDirectorySizes,
+  findDirectoryBySize,
 } from '@/aoc2022/day07'
 
 const aoc = {
@@ -1297,6 +1298,68 @@ describe('day07', () => {
       const solution = sumDirectorySizes(rootDirectory, (size) => size <= 100000 ? size : 0)
       console.log('puzzle #1 answer: ', solution)
       expect(solution).toBe(2031851)
+    })
+  })
+
+  describe('findDirectoryBySize', () => {
+    
+    it('gets a file system tree and finds the directory with the smallest sizes up to 100000 and returns 95437', () => {
+      const totalDiskSpace = 70000000
+      const requiredSpaceForUpdate = 30000000
+      const input: DirectoryType =
+        {name: '/', entries: [
+          {name: 'a', entries: [
+            {name: 'e', entries: [
+              {name: 'i', size: 584},
+            ], size: 584},
+            {name: 'f', size: 29116},
+            {name: 'g', size: 2557},
+            {name: 'h.lst', size: 62596},
+          ], size: 94853},
+          {name: 'b.txt', size: 14848514},
+          {name: 'c.dat', size: 8504156},
+          {name: 'd', entries: [
+            {name: 'j', size: 4060174},
+            {name: 'd.log', size: 8033020},
+            {name: 'd.ext', size: 5626152},
+            {name: 'k', size: 7214296},
+          ], size: 24933642}
+        ], size: 48381165}
+      const usedDiskSpace = input.size
+      const minimumSizeOfDirectoryToDelete = requiredSpaceForUpdate - (totalDiskSpace - usedDiskSpace)
+
+      expect(minimumSizeOfDirectoryToDelete).toBe(8381165)
+
+      const result = findDirectoryBySize(input, (directorySize, currentSelection) => {
+        let selectedSize = currentSelection ? currentSelection : directorySize
+        if (currentSelection > 0 && directorySize >= minimumSizeOfDirectoryToDelete) {
+          selectedSize = Math.min(directorySize, currentSelection)
+        }
+        return selectedSize
+      })
+      expect(result).toBe(24933642)
+    })
+  })
+
+  describe('solves puzzle #2', () => {
+    it('gets shell history of the puzzle as input and returns the size of that directory which would free up just enough disk space for the update.', () => {
+      const totalDiskSpace = 70000000
+      const requiredSpaceForUpdate = 30000000
+      const rootDirectory: DirectoryType = parseShellHistoryToFileSystemTree(aoc.puzzleInput)
+      const usedDiskSpace = rootDirectory.size
+      const minimumSizeOfDirectoryToDelete = requiredSpaceForUpdate - (totalDiskSpace - usedDiskSpace)
+
+      expect(minimumSizeOfDirectoryToDelete).toBe(2558312)
+
+      const solution = findDirectoryBySize(rootDirectory, (directorySize, currentSelection) => {
+        let selectedSize = currentSelection ? currentSelection : directorySize
+        if (currentSelection > 0 && directorySize >= minimumSizeOfDirectoryToDelete) {
+          selectedSize = Math.min(directorySize, currentSelection)
+        }
+        return selectedSize
+      })
+      console.log('puzzle #2 answer: ', solution)
+      expect(solution).toBe(2568781)
     })
   })
 })

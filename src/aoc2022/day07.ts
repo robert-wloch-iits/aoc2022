@@ -113,3 +113,19 @@ export function sumDirectorySizes(directory: DirectoryType, sizeSelectorFn: (siz
   }
   return result
 }
+
+export function findDirectoryBySize(
+  directory: DirectoryType, 
+  sizeSelectorFn: (directorySize: number, currentSelection: number) => number, 
+  currentSelection = 0): number
+  {
+  let result: number = sizeSelectorFn(directory.size, currentSelection)
+  if (directory.entries.length > 0) {
+    directory.entries.forEach((entry) => {
+      if (isDirectory(entry)) {
+        result = findDirectoryBySize(entry, sizeSelectorFn, result)
+      }
+    })
+  }
+  return result
+}
