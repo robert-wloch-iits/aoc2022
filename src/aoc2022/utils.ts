@@ -56,3 +56,22 @@ export function findStartOfSequence<S>(input: S[], matcher: (nextSymbol: S, matc
   }
   return result
 }
+
+export function subset<T>(matrix: T[][], startRow: number, rowCount: number, startColumn: number, columnCount: number, ): T[][] {
+  const result: T[][] = []
+  const lastRowIndex = startRow + rowCount - 1
+  if (startRow >= 0 && rowCount > 0 && lastRowIndex < matrix.length) {
+    const lastColumnIndex = startColumn + columnCount - 1
+    if (startColumn >= 0 && columnCount > 0 && lastColumnIndex < matrix[0].length) {
+      for (let rowIndex = startRow; rowIndex <= lastRowIndex; rowIndex++) {
+        let rowSubset: T[] = []
+        for (let columnIndex = startColumn; columnIndex <= lastColumnIndex; columnIndex++) {
+          rowSubset.push(matrix[rowIndex][columnIndex])
+        }
+        result.push(rowSubset)
+        rowSubset = []
+      }
+    }
+  }
+  return result
+}

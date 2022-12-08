@@ -1,5 +1,12 @@
 import {describe, it, expect} from 'vitest'
-import {parseInput, parseInputWithoutTrim, transposeReversedLines, uniqueStringMatcher, findStartOfSequence} from '@/aoc2022/utils'
+import {
+  parseInput,
+  parseInputWithoutTrim,
+  transposeReversedLines,
+  uniqueStringMatcher,
+  findStartOfSequence,
+  subset,
+} from '@/aoc2022/utils'
 
 type TestType = {
   value: string
@@ -163,6 +170,64 @@ C`
       it.each(testDataStartOfSequence)('gets "$input" as input and returns $expected as start index of sequence', ({input, matchBufferLength, offsetToMatchIndex, expected}) => {
         expect(findStartOfSequence<string>(input, uniqueStringMatcher, matchBufferLength, offsetToMatchIndex)).toBe(expected)
       })
+    })
+  })
+
+  describe('subset', () => {
+    it('gets an empty matrix and returns an empty matrix', () => {
+      const heightMap: number[][] = subset([], 1, 3, 1, 3)
+      const expected: number[][] = []
+      expect(heightMap).toStrictEqual(expected)
+    })
+
+    it('gets one row as matrix and returns an empty matrix', () => {
+      const heightMap: number[][] = subset([[3, 0, 3, 7, 3]], 1, 3, 1, 3)
+      const expected: number[][] = []
+      expect(heightMap).toStrictEqual(expected)
+    })
+
+    it('gets two rows as matrix and returns an empty matrix', () => {
+      const heightMap: number[][] = subset([
+        [3, 0, 3, 7, 3],
+        [2, 5, 5, 1, 2],
+      ],
+      1, 3, 1, 3)
+      const expected: number[][] = []
+      expect(heightMap).toStrictEqual(expected)
+    })
+
+    it('gets three rows with one column as matrix and returns an empty matrix', () => {
+      const heightMap: number[][] = subset([[3],[2],[6]], 1, 3, 1, 3)
+      const expected: number[][] = []
+      expect(heightMap).toStrictEqual(expected)
+    })
+
+    it('gets three rows with two columns as matrix and returns an empty matrix', () => {
+      const heightMap: number[][] = subset([
+        [3, 0],
+        [2, 5],
+        [6, 5],
+      ],
+      1, 3, 1, 3)
+      const expected: number[][] = []
+      expect(heightMap).toStrictEqual(expected)
+    })
+
+    it('gets five rows with 5 columns as matrix and returns a matrix with three rows and three columns', () => {
+      const heightMap: number[][] = subset([
+        [3, 0, 3, 7, 3],
+        [2, 5, 5, 1, 2],
+        [6, 5, 3, 3, 2],
+        [3, 3, 5, 4, 9],
+        [3, 5, 3, 9, 0],
+      ],
+      1, 3, 1, 3)
+      const expected: number[][] = [
+        [5, 5, 1],
+        [5, 3, 3],
+        [3, 5, 4],
+      ]
+      expect(heightMap).toStrictEqual(expected)
     })
   })
 })
