@@ -1,4 +1,4 @@
-import {parseInput, subset} from '@/aoc2022/utils'
+import {parseInput, subset, initializeMatrix, distanceInArray} from '@/aoc2022/utils'
 
 
 export function parseHeightMap(input: string): number[][] {
@@ -39,6 +39,46 @@ export function countVisibleTrees(heightMap: number[][]): number {
           const isVisible = isVisibleFromLeft || isVisibleFromRight || isVisibleFromTop || isVisibleFromBottom
 
           result += isVisible ? 1 : 0
+        }
+      }
+
+    }
+  }
+  return result
+}
+
+export function mapHeightMapToViewScore(heightMap: number[][]): number[][] {
+  const result = initializeMatrix<number>(heightMap, 0)
+  const rowStart = 1
+  const rowCount = Math.max(heightMap.length - 2 * rowStart, 0)
+  const columnStart = 1
+  const columnCount = heightMap.length > 0 ? Math.max(heightMap[0].length - 2 * columnStart, 0) : 0
+
+  const lastRowIndex = rowStart + rowCount - 1
+  if (rowStart >= 0 && rowCount > 0 && lastRowIndex < heightMap.length) {
+    const lastColumnIndex = columnStart + columnCount - 1
+    if (columnStart >= 0 && columnCount > 0 && lastColumnIndex < heightMap[0].length) {
+
+      for (let rowIndex = rowStart; rowIndex <= lastRowIndex; rowIndex++) {
+        for (let columnIndex = columnStart; columnIndex <= lastColumnIndex; columnIndex++) {
+          let viewScore = 0
+          const cellValue = heightMap[rowIndex][columnIndex]
+
+          const leftRowPart = subset<number>(heightMap, rowIndex, 1, 0, columnIndex).flat().reverse()
+          const rightRowPart = subset<number>(heightMap, rowIndex, 1, columnIndex + 1, lastColumnIndex - columnIndex + 1).flat()
+          const topColumnPart = subset<number>(heightMap, 0, rowIndex, columnIndex, 1).flat().reverse()
+          const bottomColumnPart = subset<number>(heightMap, rowIndex + 1, lastRowIndex - rowIndex + 1, columnIndex, 1).flat()
+          
+          const criteriaFn = (value: number) => value >= cellValue
+
+          const leftScore = distanceInArray<number>(leftRowPart, criteriaFn)
+          const rightScore = distanceInArray<number>(rightRowPart, criteriaFn)
+          const topScore = distanceInArray<number>(topColumnPart, criteriaFn)
+          const bottomScore = distanceInArray<number>(bottomColumnPart, criteriaFn)
+          
+          viewScore = leftScore * rightScore * topScore * bottomScore
+
+          result[rowIndex][columnIndex] = viewScore
         }
       }
 

@@ -6,6 +6,9 @@ import {
   uniqueStringMatcher,
   findStartOfSequence,
   subset,
+  initializeMatrix,
+  distanceInArray,
+  matrixReduce,
 } from '@/aoc2022/utils'
 
 type TestType = {
@@ -228,6 +231,130 @@ C`
         [3, 5, 4],
       ]
       expect(heightMap).toStrictEqual(expected)
+    })
+  })
+
+  describe('initializeMatrix', () => {
+    it('gets an empty matrix and returns an empty matrix', () => {
+      const initializedMatrix: number[][] = initializeMatrix<number>([], 0)
+      const expected: number[][] = []
+      expect(initializedMatrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix with one row and returns a matrix with one row', () => {
+      const initializedMatrix: number[][] = initializeMatrix<number>([[3, 0, 3, 7, 3]], 0)
+      const expected: number[][] = [[0, 0, 0, 0, 0]]
+      expect(initializedMatrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix with two rows and returns a matrix with two rows', () => {
+      const initializedMatrix: number[][] = initializeMatrix<number>([
+        [3, 0, 3, 7, 3],
+        [2, 5, 5, 1, 2],
+      ], 0)
+      const expected: number[][] = [
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+      ]
+      expect(initializedMatrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix with three rows and one column and returns a matrix with three rows with one column', () => {
+      const initializedMatrix: number[][] = initializeMatrix<number>([[3],[2],[6]], 0)
+      const expected: number[][] = [[0],[0],[0]]
+      expect(initializedMatrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix with three rows and two columns and returns a matrix with three rows and two columns', () => {
+      const initializedMatrix: number[][] = initializeMatrix<number>([
+        [3, 0],
+        [2, 5],
+        [6, 5],
+      ], 0)
+      const expected: number[][] = [
+        [0, 0],
+        [0, 0],
+        [0, 0],
+      ]
+      expect(initializedMatrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix with five rows and five columns and returns a matrix with five rows and five columns', () => {
+      const initializedMatrix: number[][] = initializeMatrix<number>([
+        [3, 0, 3, 7, 3],
+        [2, 5, 5, 1, 2],
+        [6, 5, 3, 3, 2],
+        [3, 3, 5, 4, 9],
+        [3, 5, 3, 9, 0],
+      ], 0)
+      const expected: number[][] = [
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+      ]
+      expect(initializedMatrix).toStrictEqual(expected)
+    })
+  })
+
+  describe('distanceInArray', () => {
+    const candidate = 5
+    const criteriaFn = (value: number) => value >= candidate
+
+    it('gets an empty array as input and returns 0', () => {
+      const input: number[] = []
+      expect(distanceInArray<number>(input, criteriaFn)).toBe(0)
+    })
+
+    it('gets an array[3] without 5 as input and returns 3', () => {
+      const input: number[] = [1, 2, 3]
+      expect(distanceInArray<number>(input, criteriaFn)).toBe(3)
+    })
+
+    it('gets an array[3] with 5 at first index as input and returns 1', () => {
+      const input: number[] = [5, 2, 3]
+      expect(distanceInArray<number>(input, criteriaFn)).toBe(1)
+    })
+
+    it('gets an array[3] with 5 at second index as input and returns 2', () => {
+      const input: number[] = [1, 5, 3]
+      expect(distanceInArray<number>(input, criteriaFn)).toBe(2)
+    })
+  })
+
+  describe('matrixReduce', () => {
+    const reducerFn = (acc: number, value: number) => Math.max(acc, value)
+
+    it('gets an empty matrix as input and returns 0', () => {
+      const input: number[][] = []
+      expect(matrixReduce<number>(input, reducerFn, 0)).toBe(0)
+    })
+
+    it('gets a matrix[1][3] as input and returns 3', () => {
+      const input: number[][] = [
+        [0, 3, 0],
+      ]
+      expect(matrixReduce<number>(input, reducerFn, 0)).toBe(3)
+    })
+
+    it('gets a matrix[2[5] as input and returns 4', () => {
+      const input: number[][] = [
+        [0, 0, 0, 0, 0],
+        [0, 1, 4, 1, 0],
+      ]
+      expect(matrixReduce<number>(input, reducerFn, 0)).toBe(4)
+    })
+
+    it('gets a matrix[5][5] as input and returns 8', () => {
+      const input: number[][] = [
+        [0, 0, 0, 0, 0],
+        [0, 1, 4, 1, 0],
+        [0, 6, 1, 2, 0],
+        [0, 1, 8, 3, 0],
+        [0, 0, 0, 0, 0],
+      ]
+      expect(matrixReduce<number>(input, reducerFn, 0)).toBe(8)
     })
   })
 })

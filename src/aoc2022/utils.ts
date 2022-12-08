@@ -75,3 +75,35 @@ export function subset<T>(matrix: T[][], startRow: number, rowCount: number, sta
   }
   return result
 }
+
+export function initializeMatrix<T>(matrix: T[][], initialCellValue: T): T[][] {
+  const result: T[][] = matrix.length > 0
+    ? matrix.map((row) => row.length > 0
+      ? row.map(() => initialCellValue)
+      : [])
+    : []
+  return result
+}
+
+export function distanceInArray<T>(array: T[], criteriaFn: (value: T) => boolean, defaultDistance = array.length) {
+  let result = 0
+  if (array.length > 0) {
+    const index = array.findIndex(criteriaFn)
+    result = index < 0 ? defaultDistance : index + 1
+  }
+  return result
+}
+
+export function matrixReduce<T>(matrix: T[][], reducerFn: (acc: T, value: T) => T, initialValue: T): T {
+  let result: T = initialValue
+
+  if (matrix.length > 0) {
+    matrix.forEach((row) => {
+      if (row.length > 0) {
+        row.forEach((value) => result = reducerFn(result, value))
+      }
+    })
+  }
+
+  return result
+}

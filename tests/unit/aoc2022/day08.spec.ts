@@ -1,8 +1,10 @@
 import {describe, it, expect} from 'vitest'
 
+import {matrixReduce} from '@/aoc2022/utils'
 import {
   parseHeightMap,
   countVisibleTrees,
+  mapHeightMapToViewScore,
 } from '@/aoc2022/day08'
 
 const aoc = {
@@ -137,7 +139,7 @@ describe('day08', () => {
       expect(heightMap).toStrictEqual(expected)
     })
   })
-  
+
   describe('countVisibleTrees', () => {
     it('gets an empty input and returns 0', () => {
       const result = countVisibleTrees([])
@@ -189,6 +191,83 @@ describe('day08', () => {
       const solution = countVisibleTrees(heightMap)
       console.log('puzzle #1 answer: ', solution)
       expect(solution).toBe(1814)
+    })
+  })
+
+  describe('mapHeightMapToViewScore', () => {
+    it('gets an empty input and returns an empty view score map', () => {
+      const viewScoreMap: number[][] = mapHeightMapToViewScore([])
+      const expected: number[][] = []
+      expect(viewScoreMap).toStrictEqual(expected)
+    })
+
+    it('gets one row of heights as input and returns a view score map with one row', () => {
+      const viewScoreMap: number[][] = mapHeightMapToViewScore([[3, 0, 3, 7, 3]])
+      const expected: number[][] = [[0, 0, 0, 0, 0]]
+      expect(viewScoreMap).toStrictEqual(expected)
+    })
+
+    it('gets two rows of heights as input and returns a view score map with two rows', () => {
+      const viewScoreMap: number[][] = mapHeightMapToViewScore([
+        [3, 0, 3, 7, 3],
+        [2, 5, 5, 1, 2],
+      ])
+      const expected: number[][] = [
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+      ]
+      expect(viewScoreMap).toStrictEqual(expected)
+    })
+
+    it('gets three rows with one column of heights as input and returns a view score map with three rows with one column', () => {
+      const viewScoreMap: number[][] = mapHeightMapToViewScore([[3],[2],[6]])
+      const expected: number[][] = [[0],[0],[0]]
+      expect(viewScoreMap).toStrictEqual(expected)
+    })
+
+    it('gets three rows with two columns of heights as input and returns a view score map with three rows with two columns', () => {
+      const viewScoreMap: number[][] = mapHeightMapToViewScore([
+        [3, 0],
+        [2, 5],
+        [6, 5],
+      ])
+      const expected: number[][] = [
+        [0, 0],
+        [0, 0],
+        [0, 0],
+      ]
+      expect(viewScoreMap).toStrictEqual(expected)
+    })
+
+    it('gets five rows with 5 columns of heights as input and returns a view score map with five rows and five columns', () => {
+      const viewScoreMap: number[][] = mapHeightMapToViewScore([
+        [3, 0, 3, 7, 3],
+        [2, 5, 5, 1, 2],
+        [6, 5, 3, 3, 2],
+        [3, 3, 5, 4, 9],
+        [3, 5, 3, 9, 0],
+      ])
+      const expected: number[][] = [
+        [0, 0, 0, 0, 0],
+        [0, 1, 4, 1, 0],
+        [0, 6, 1, 2, 0],
+        [0, 1, 8, 3, 0],
+        [0, 0, 0, 0, 0],
+      ]
+      expect(viewScoreMap).toStrictEqual(expected)
+    })
+  })
+
+  describe('solves puzzle #2', () => {
+    it('gets the puzzle input and returns the highest scenic score', () => {
+      const heightMap: number[][] = parseHeightMap(aoc.puzzleInput)
+      const viewScoreMap: number[][] = mapHeightMapToViewScore(heightMap)
+
+      const reducerFn = (acc: number, value: number) => Math.max(acc, value)
+      const solution = matrixReduce<number>(viewScoreMap, reducerFn, 0)
+
+      console.log('puzzle #2 answer: ', solution)
+      expect(solution).toBe(330786)
     })
   })
 })
