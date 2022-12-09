@@ -85,6 +85,48 @@ export function initializeMatrix<T>(matrix: T[][], initialCellValue: T): T[][] {
   return result
 }
 
+export function appendColumn<T>(matrix: T[][], initialCellValue: T): T[][] {
+  const result: T[][] = matrix
+  if (result.length > 0) {
+    result.forEach((row) => row.push(initialCellValue))
+  } else {
+    result.push([initialCellValue])
+  }
+  return result
+}
+
+export function prependColumn<T>(matrix: T[][], initialCellValue: T): T[][] {
+  const result: T[][] = matrix
+  if (result.length > 0) {
+    result.forEach((row) => row.splice(0, 0, initialCellValue))
+  } else {
+    result.push([initialCellValue])
+  }
+  return result
+}
+
+export function appendRow<T>(matrix: T[][], initialCellValue: T): T[][] {
+  const result: T[][] = matrix
+  if (result.length > 0) {
+    const newRow = Array(result[0].length).fill(initialCellValue)
+    result.push(newRow)
+  } else {
+    result.push([initialCellValue])
+  }
+  return result
+}
+
+export function prependRow<T>(matrix: T[][], initialCellValue: T): T[][] {
+  const result: T[][] = matrix
+  if (result.length > 0) {
+    const newRow = Array(result[0].length).fill(initialCellValue)
+    result.splice(0, 0, newRow)
+  } else {
+    result.push([initialCellValue])
+  }
+  return result
+}
+
 export function distanceInArray<T>(array: T[], criteriaFn: (value: T) => boolean, defaultDistance = array.length) {
   let result = 0
   if (array.length > 0) {
@@ -106,4 +148,43 @@ export function matrixReduce<T>(matrix: T[][], reducerFn: (acc: T, value: T) => 
   }
 
   return result
+}
+
+export type Coordinate2D = {
+  row: number
+  column: number
+}
+export function findCoordinate2D<T>(matrix: T[][], needle: T, fallBacks: (T | null)[] = []): Coordinate2D {
+  const result: Coordinate2D = {row: -1, column: -1}
+  const fallBackLocation: Coordinate2D = {row: -1, column: -1}
+  if (matrix.length > 0) {
+    for (let rowIndex = 0; rowIndex < matrix.length; rowIndex++) {
+      const row = matrix[rowIndex];
+      if (row.length > 0) {
+        for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
+          const cell = row[columnIndex];
+          if (cell === needle) {
+            result.row = rowIndex
+            result.column = columnIndex
+          } else if (fallBacks.length > 0) {
+            fallBacks.forEach(fallBack => {
+              if ((fallBackLocation.row < 0 || fallBackLocation.column < 0) && cell === fallBack) {
+                fallBackLocation.row = rowIndex
+                fallBackLocation.column = columnIndex
+              } 
+            })
+          }
+        }
+      }
+    }
+  }
+  return (result.row >= 0 && result.column >= 0) ? result : fallBackLocation
+}
+
+export function setMatrixValue<T>(matrix: T[][], coordinate: Coordinate2D, newValue: T) {
+  if (0 <= coordinate.row && coordinate.row < matrix.length) {
+    if (0 <= coordinate.column && coordinate.column < matrix[0].length) {
+      matrix[coordinate.row][coordinate.column] = newValue
+    }
+  }
 }

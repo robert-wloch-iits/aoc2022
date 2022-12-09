@@ -7,8 +7,15 @@ import {
   findStartOfSequence,
   subset,
   initializeMatrix,
+  appendColumn,
+  prependColumn,
+  appendRow,
+  prependRow,
   distanceInArray,
   matrixReduce,
+  Coordinate2D,
+  findCoordinate2D,
+  setMatrixValue,
 } from '@/aoc2022/utils'
 
 type TestType = {
@@ -298,6 +305,98 @@ C`
     })
   })
 
+  describe('appendColumn', () => {
+    it('gets an empty matrix and returns a matrix with a new column', () => {
+      const matrix: number[][] = []
+      appendColumn<number>(matrix, 1)
+      const expected: number[][] = [[1]]
+      expect(matrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix with one row and returns a matrix with one row and a new column', () => {
+      const matrix: number[][] = [[0]]
+      appendColumn<number>(matrix, 1)
+      const expected: number[][] = [[0, 1]]
+      expect(matrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix with two rows and returns a matrix with two rows and a new column', () => {
+      const matrix: number[][] = [[0], [0]]
+      appendColumn<number>(matrix, 1)
+      const expected: number[][] = [[0, 1], [0, 1]]
+      expect(matrix).toStrictEqual(expected)
+    })
+  })
+
+  describe('prependColumn', () => {
+    it('gets an empty matrix and returns a matrix with a new column', () => {
+      const matrix: number[][] = []
+      prependColumn<number>(matrix, 1)
+      const expected: number[][] = [[1]]
+      expect(matrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix with one row and returns a matrix with one row and a new column', () => {
+      const matrix: number[][] = [[0]]
+      prependColumn<number>(matrix, 1)
+      const expected: number[][] = [[1, 0]]
+      expect(matrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix with two rows and returns a matrix with two rows and a new column', () => {
+      const matrix: number[][] = [[0], [0]]
+      prependColumn<number>(matrix, 1)
+      const expected: number[][] = [[1, 0], [1, 0]]
+      expect(matrix).toStrictEqual(expected)
+    })
+  })
+
+  describe('appendRow', () => {
+    it('gets an empty matrix and returns a matrix with a new row', () => {
+      const matrix: number[][] = []
+      appendRow<number>(matrix, 1)
+      const expected: number[][] = [[1]]
+      expect(matrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix with one row and returns a matrix with two rows', () => {
+      const matrix: number[][] = [[0]]
+      appendRow<number>(matrix, 1)
+      const expected: number[][] = [[0],[1]]
+      expect(matrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix with two rows and returns a matrix with three rows', () => {
+      const matrix: number[][] = [[0, 0], [0, 0]]
+      appendRow<number>(matrix, 1)
+      const expected: number[][] = [[0, 0], [0, 0], [1, 1]]
+      expect(matrix).toStrictEqual(expected)
+    })
+  })
+
+  describe('prependRow', () => {
+    it('gets an empty matrix and returns a matrix with a new row', () => {
+      const matrix: number[][] = []
+      prependRow<number>(matrix, 1)
+      const expected: number[][] = [[1]]
+      expect(matrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix with one row and returns a matrix with two rows', () => {
+      const matrix: number[][] = [[0]]
+      prependRow<number>(matrix, 1)
+      const expected: number[][] = [[1], [0]]
+      expect(matrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix with two rows and returns a matrix with three rows', () => {
+      const matrix: number[][] = [[0, 0], [0, 0]]
+      prependRow<number>(matrix, 1)
+      const expected: number[][] = [[1, 1], [0, 0], [0, 0]]
+      expect(matrix).toStrictEqual(expected)
+    })
+  })
+
   describe('distanceInArray', () => {
     const candidate = 5
     const criteriaFn = (value: number) => value >= candidate
@@ -355,6 +454,56 @@ C`
         [0, 0, 0, 0, 0],
       ]
       expect(matrixReduce<number>(input, reducerFn, 0)).toBe(8)
+    })
+  })
+
+  describe('findCoordinate2D', () => {
+    it('gets a matrix without values and returns no coordinates', () => {
+      const input: string[][] = []
+      expect(findCoordinate2D(input, 'H')).toStrictEqual({row: -1, column: -1})
+    })
+  
+    it('gets a matrix with values excluding the searched one and returns no coordinates', () => {
+      const input: string[][] = [['A', 'B'], ['C', 'D']]
+      expect(findCoordinate2D(input, 'H')).toStrictEqual({row: -1, column: -1})
+    })
+  
+    it('gets a matrix with values excluding the searched one but with the fallback value and returns no coordinates', () => {
+      const input: string[][] = [['A', 'B'], ['C', 'D']]
+      expect(findCoordinate2D(input, 'H', ['B'])).toStrictEqual({row: 0, column: 1})
+    })
+  
+    it('gets a matrix with values excluding the searched one but with the second fallback value and returns no coordinates', () => {
+      const input: string[][] = [['A', 'B'], ['C', 'D']]
+      expect(findCoordinate2D(input, 'H', ['I', 'B'])).toStrictEqual({row: 0, column: 1})
+    })
+  
+    it('gets a matrix with values including the searched one and returns the coordinates', () => {
+      const input: string[][] = [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']]
+      expect(findCoordinate2D(input, 'H')).toStrictEqual({row: 2, column: 1})
+    })
+  })
+
+  describe('setMatrixValue', () => {
+    it('gets an empty matrix and an invalid coordinate and leaves the matrix unchanged', () => {
+      const matrix: number[][] = []
+      setMatrixValue<number>(matrix, {row: -1, column: -1}, 1)
+      const expected: number[][] = []
+      expect(matrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix and an invalid coordinate and leaves the matrix unchanged', () => {
+      const matrix: number[][] = [[0, 0], [0, 0]]
+      setMatrixValue<number>(matrix, {row: -1, column: -1}, 1)
+      const expected: number[][] = matrix
+      expect(matrix).toStrictEqual(expected)
+    })
+
+    it('gets a matrix and a valid coordinate and modifies the matrix at the coordinate', () => {
+      const matrix: number[][] = [[0, 0], [0, 0]]
+      setMatrixValue<number>(matrix, {row: 0, column: 1}, 1)
+      const expected: number[][] = [[0, 1], [0, 0]]
+      expect(matrix).toStrictEqual(expected)
     })
   })
 })

@@ -2072,5 +2072,17 @@ describe('day09', () => {
       expect(ropeMap).toStrictEqual(expectedRopeMap)
       expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
     })
+
+    it('gets command "R 1" with H left of T on same row moves H on top of T', () => {
+      const commands: Motion[] = [{command: 'R', steps: 1}]
+      const ropeMap: RopeMapType = [['.','H','T']]
+      const tailVisitMap: TailVisitMapType = [[0, 0, 0]]
+      const expectedRopeMap: RopeMapType = [['.', '.', 'H']]
+      const expectedTailVisitMap: TailVisitMapType = [[0, 0, 0]]
+
+      executeCommand(commands, ropeMap, tailVisitMap)
+      expect(ropeMap).toStrictEqual(expectedRopeMap)
+      expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+    })
   })
 })
