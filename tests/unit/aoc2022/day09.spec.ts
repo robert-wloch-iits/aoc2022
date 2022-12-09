@@ -1,11 +1,13 @@
 import {describe, it, expect} from 'vitest'
 
+import {matrixReduce} from '@/aoc2022/utils'
 import {
   Motion,
   parseMotions,
   RopeMapType,
   TailVisitMapType,
-  executeCommand,
+  executeCommands,
+  countVisitedPositions,
 } from '@/aoc2022/day09'
 
 const aoc = {
@@ -2048,7 +2050,7 @@ describe('day09', () => {
     })
   })
 
-  describe('executeCommand', () => {
+  describe('executeCommands', () => {
     it('gets no commands and an 1x1 initial rope map and returns an 1x1 rope map and tail visit map', () => {
       const commands: Motion[] = []
       const ropeMap: RopeMapType = [['s']]
@@ -2056,13 +2058,13 @@ describe('day09', () => {
       const expectedRopeMap: RopeMapType = [['s']]
       const expectedTailVisitMap: TailVisitMapType = [['s']]
 
-      executeCommand(commands, ropeMap, tailVisitMap)
+      executeCommands(commands, ropeMap, tailVisitMap)
       expect(ropeMap).toStrictEqual(expectedRopeMap)
       expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
     })
 
     describe('moving right', () => {
-      const commands: Motion[] = [{command: 'R', steps: 1}]
+      let commands: Motion[] = [{command: 'R', steps: 1}]
 
       it('gets command "R 1" with H and T on s and moves H right of s (and T)', () => {
         const ropeMap: RopeMapType = [['s']]
@@ -2070,7 +2072,7 @@ describe('day09', () => {
         const expectedRopeMap: RopeMapType = [['s', 'H']]
         const expectedTailVisitMap: TailVisitMapType = [['s', 0]]
   
-        executeCommand(commands, ropeMap, tailVisitMap)
+        executeCommands(commands, ropeMap, tailVisitMap)
         expect(ropeMap).toStrictEqual(expectedRopeMap)
         expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
       })
@@ -2081,7 +2083,7 @@ describe('day09', () => {
         const expectedRopeMap: RopeMapType = [['.', '.', 'H']]
         const expectedTailVisitMap: TailVisitMapType = [[0, 0, 0]]
   
-        executeCommand(commands, ropeMap, tailVisitMap)
+        executeCommands(commands, ropeMap, tailVisitMap)
         expect(ropeMap).toStrictEqual(expectedRopeMap)
         expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
       })
@@ -2092,7 +2094,7 @@ describe('day09', () => {
         const expectedRopeMap: RopeMapType = [['.', 'T', 'H']]
         const expectedTailVisitMap: TailVisitMapType = [[0, 0, 0]]
   
-        executeCommand(commands, ropeMap, tailVisitMap)
+        executeCommands(commands, ropeMap, tailVisitMap)
         expect(ropeMap).toStrictEqual(expectedRopeMap)
         expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
       })
@@ -2103,22 +2105,34 @@ describe('day09', () => {
         const expectedRopeMap: RopeMapType = [['.', 'T', 'H']]
         const expectedTailVisitMap: TailVisitMapType = [[0, 1, 0]]
   
-        executeCommand(commands, ropeMap, tailVisitMap)
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+  
+      it('gets command "R 2" with H right of T and moves H further and pulls T to left of H', () => {
+        commands = [{command: 'R', steps: 2}]
+        const ropeMap: RopeMapType = [['T','H','.']]
+        const tailVisitMap: TailVisitMapType = [[0, 0, 1]]
+        const expectedRopeMap: RopeMapType = [['.', '.', 'T', 'H']]
+        const expectedTailVisitMap: TailVisitMapType = [[0, 1, 2, 0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
         expect(ropeMap).toStrictEqual(expectedRopeMap)
         expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
       })
     })
 
     describe('moving left', () => {
-      const commands: Motion[] = [{command: 'L', steps: 1}]
+      let commands: Motion[] = [{command: 'L', steps: 1}]
 
-      it('gets command "L 1" with H and T on s and moves H right of s (and T)', () => {
+      it('gets command "L 1" with H and T on s and moves H left of s (and T)', () => {
         const ropeMap: RopeMapType = [['s']]
         const tailVisitMap: TailVisitMapType = [['s']]
         const expectedRopeMap: RopeMapType = [['H', 's']]
         const expectedTailVisitMap: TailVisitMapType = [[0, 's']]
   
-        executeCommand(commands, ropeMap, tailVisitMap)
+        executeCommands(commands, ropeMap, tailVisitMap)
         expect(ropeMap).toStrictEqual(expectedRopeMap)
         expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
       })
@@ -2129,7 +2143,7 @@ describe('day09', () => {
         const expectedRopeMap: RopeMapType = [['.', 'H', '.']]
         const expectedTailVisitMap: TailVisitMapType = [[0, 0, 0]]
   
-        executeCommand(commands, ropeMap, tailVisitMap)
+        executeCommands(commands, ropeMap, tailVisitMap)
         expect(ropeMap).toStrictEqual(expectedRopeMap)
         expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
       })
@@ -2140,7 +2154,7 @@ describe('day09', () => {
         const expectedRopeMap: RopeMapType = [['H', 'T', '.']]
         const expectedTailVisitMap: TailVisitMapType = [[0, 0, 0]]
   
-        executeCommand(commands, ropeMap, tailVisitMap)
+        executeCommands(commands, ropeMap, tailVisitMap)
         expect(ropeMap).toStrictEqual(expectedRopeMap)
         expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
       })
@@ -2151,10 +2165,678 @@ describe('day09', () => {
         const expectedRopeMap: RopeMapType = [['H', 'T', '.']]
         const expectedTailVisitMap: TailVisitMapType = [[0, 1, 0]]
   
-        executeCommand(commands, ropeMap, tailVisitMap)
+        executeCommands(commands, ropeMap, tailVisitMap)
         expect(ropeMap).toStrictEqual(expectedRopeMap)
         expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
       })
+  
+      it('gets command "L 2" with H left of T and moves H further and pulls T to right of H', () => {
+        commands = [{command: 'L', steps: 2}]
+        const ropeMap: RopeMapType = [['.','H','T']]
+        const tailVisitMap: TailVisitMapType = [[1, 0, 0]]
+        const expectedRopeMap: RopeMapType = [['H', 'T', '.', '.']]
+        const expectedTailVisitMap: TailVisitMapType = [[0, 2, 1, 0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+    })
+
+    describe('moving up', () => {
+      let commands: Motion[] = [{command: 'U', steps: 1}]
+
+      it('gets command "U 1" with H and T on s and moves H above of s (and T)', () => {
+        const ropeMap: RopeMapType = [['s']]
+        const tailVisitMap: TailVisitMapType = [['s']]
+        const expectedRopeMap: RopeMapType = [['H'], ['s']]
+        const expectedTailVisitMap: TailVisitMapType = [[0], ['s']]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+  
+      it('gets command "U 1" with H below of T on same column and moves H on top of T', () => {
+        const ropeMap: RopeMapType = [['.'], ['T'], ['H']]
+        const tailVisitMap: TailVisitMapType = [[0], [0], [0]]
+        const expectedRopeMap: RopeMapType = [['.'], ['H'], ['.']]
+        const expectedTailVisitMap: TailVisitMapType = [[0], [0], [0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+  
+      it('gets command "U 1" with H on top of T and moves H above of T', () => {
+        const ropeMap: RopeMapType = [['.'], ['H'], ['.']]
+        const tailVisitMap: TailVisitMapType = [[0], [0], [0]]
+        const expectedRopeMap: RopeMapType = [['H'], ['T'], ['.']]
+        const expectedTailVisitMap: TailVisitMapType = [[0], [0], [0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+  
+      it('gets command "U 1" with H above of T and moves H further and pulls T below of H', () => {
+        const ropeMap: RopeMapType = [['.'], ['H'], ['T']]
+        const tailVisitMap: TailVisitMapType = [[0], [0], [0]]
+        const expectedRopeMap: RopeMapType = [['H'], ['T'], ['.']]
+        const expectedTailVisitMap: TailVisitMapType = [[0], [1], [0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+  
+      it('gets command "U 2" with H above of T and moves H further and pulls T below of H', () => {
+        commands = [{command: 'U', steps: 2}]
+        const ropeMap: RopeMapType = [['.'], ['H'], ['T']]
+        const tailVisitMap: TailVisitMapType = [[1], [0], [0]]
+        const expectedRopeMap: RopeMapType = [['H'], ['T'], ['.'], ['.']]
+        const expectedTailVisitMap: TailVisitMapType = [[0], [2], [1], [0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+    })
+
+    describe('moving down', () => {
+      let commands: Motion[] = []
+      beforeEach(() => {
+        commands = [{command: 'D', steps: 1}]
+      })
+
+      it('gets command "D 1" with H and T on s and moves H below of s (and T)', () => {
+        const ropeMap: RopeMapType = [['s']]
+        const tailVisitMap: TailVisitMapType = [['s']]
+        const expectedRopeMap: RopeMapType = [['s'], ['H']]
+        const expectedTailVisitMap: TailVisitMapType = [['s'], [0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+  
+      it('gets command "D 1" with H above of T on same column and moves H on top of T', () => {
+        const ropeMap: RopeMapType = [['H'], ['T'], ['.']]
+        const tailVisitMap: TailVisitMapType = [[0], [0], [0]]
+        const expectedRopeMap: RopeMapType = [['.'], ['H'], ['.']]
+        const expectedTailVisitMap: TailVisitMapType = [[0], [0], [0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+  
+      it('gets command "D 1" with H on top of T and moves H below of T', () => {
+        const ropeMap: RopeMapType = [['.'], ['H'], ['.']]
+        const tailVisitMap: TailVisitMapType = [[0], [0], [0]]
+        const expectedRopeMap: RopeMapType = [['.'], ['T'], ['H']]
+        const expectedTailVisitMap: TailVisitMapType = [[0], [0], [0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+  
+      it('gets command "D 1" with H below of T and moves H further and pulls T above of H', () => {
+        const ropeMap: RopeMapType = [['T'], ['H'], ['.']]
+        const tailVisitMap: TailVisitMapType = [[0], [0], [0]]
+        const expectedRopeMap: RopeMapType = [['.'], ['T'], ['H']]
+        const expectedTailVisitMap: TailVisitMapType = [[0], [1], [0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+  
+      it('gets command "D 2" with H below of T and moves H further and pulls T above of H', () => {
+        commands = [{command: 'D', steps: 2}]
+        const ropeMap: RopeMapType = [['T'], ['H'], ['.']]
+        const tailVisitMap: TailVisitMapType = [[0], [1], [2]]
+        const expectedRopeMap: RopeMapType = [['.'], ['.'], ['T'], ['H']]
+        const expectedTailVisitMap: TailVisitMapType = [[0], [2], [3], [0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+    })
+
+    describe('leaves T at position', () => {
+      it('gets command "D 1" with H left of T on same row and leaves T unchanged', () => {
+        const commands: Motion[] = [{command: 'D', steps: 1}]
+        const ropeMap: RopeMapType = [['H', 'T']]
+        const tailVisitMap: TailVisitMapType = [[0, 0]]
+        const expectedRopeMap: RopeMapType = [
+          ['.', 'T'],
+          ['H', '.'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [[0, 0], [0, 0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets command "U 1" with H left of T on same row and leaves T unchanged', () => {
+        const commands: Motion[] = [{command: 'U', steps: 1}]
+        const ropeMap: RopeMapType = [['H', 'T']]
+        const tailVisitMap: TailVisitMapType = [[0, 0]]
+        const expectedRopeMap: RopeMapType = [
+          ['H', '.'],
+          ['.', 'T'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [[0, 0], [0, 0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets command "L 1" with H above of T on same column and leaves T unchanged', () => {
+        const commands: Motion[] = [{command: 'L', steps: 1}]
+        const ropeMap: RopeMapType = [['H'], ['T']]
+        const tailVisitMap: TailVisitMapType = [[0], [0]]
+        const expectedRopeMap: RopeMapType = [
+          ['H', '.'],
+          ['.', 'T'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [[0, 0], [0, 0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets command "R 1" with H above of T on same column and leaves T unchanged', () => {
+        const commands: Motion[] = [{command: 'R', steps: 1}]
+        const ropeMap: RopeMapType = [['H'], ['T']]
+        const tailVisitMap: TailVisitMapType = [[0], [0]]
+        const expectedRopeMap: RopeMapType = [
+          ['.', 'H'],
+          ['T', '.'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [[0, 0], [0, 0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+    })
+
+    describe('moving T diagonally', () => {
+      it('gets command "R 1" with H right of T and on row below T and moves T left of H', () => {
+        const commands: Motion[] = [{command: 'R', steps: 1}]
+        const ropeMap: RopeMapType = [
+          ['T', '.', '.'],
+          ['.', 'H', '.'],
+        ]
+        const tailVisitMap: TailVisitMapType = [[0, 0, 0], [0, 0, 0]]
+        const expectedRopeMap: RopeMapType = [
+          ['.', '.', '.'],
+          ['.', 'T', 'H'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [[0, 0, 0], [0, 1, 0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets command "R 1" with H right of T and on row above T and moves T left of H', () => {
+        const commands: Motion[] = [{command: 'R', steps: 1}]
+        const ropeMap: RopeMapType = [
+          ['.', 'H', '.'],
+          ['T', '.', '.'],
+        ]
+        const tailVisitMap: TailVisitMapType = [[0, 0, 0], [0, 0, 0]]
+        const expectedRopeMap: RopeMapType = [
+          ['.', 'T', 'H'],
+          ['.', '.', '.'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [[0, 1, 0], [0, 0, 0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets command "L 1" with H left of T and on row below T and moves T right of H', () => {
+        const commands: Motion[] = [{command: 'L', steps: 1}]
+        const ropeMap: RopeMapType = [
+          ['.', '.', 'T'],
+          ['.', 'H', '.'],
+        ]
+        const tailVisitMap: TailVisitMapType = [[0, 0, 0], [0, 0, 0]]
+        const expectedRopeMap: RopeMapType = [
+          ['.', '.', '.'],
+          ['H', 'T', '.'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [[0, 0, 0], [0, 1, 0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets command "L 1" with H left of T and on row above T and moves T right of H', () => {
+        const commands: Motion[] = [{command: 'L', steps: 1}]
+        const ropeMap: RopeMapType = [
+          ['.', 'H', '.'],
+          ['.', '.', 'T'],
+        ]
+        const tailVisitMap: TailVisitMapType = [[0, 0, 0], [0, 0, 0]]
+        const expectedRopeMap: RopeMapType = [
+          ['H', 'T', '.'],
+          ['.', '.', '.'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [[0, 1, 0], [0, 0, 0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets command "U 1" with H right of T and on row above T and moves T below of H', () => {
+        const commands: Motion[] = [{command: 'U', steps: 1}]
+        const ropeMap: RopeMapType = [
+          ['.', '.'],
+          ['.', 'H'],
+          ['T', '.'],
+        ]
+        const tailVisitMap: TailVisitMapType = [[0, 0], [0, 0], [0, 0]]
+        const expectedRopeMap: RopeMapType = [
+          ['.', 'H'],
+          ['.', 'T'],
+          ['.', '.'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [[0, 0], [0, 1], [0, 0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets command "U 1" with H left of T and on row above T and moves T below of H', () => {
+        const commands: Motion[] = [{command: 'U', steps: 1}]
+        const ropeMap: RopeMapType = [
+          ['.', '.'],
+          ['H', '.'],
+          ['.', 'T'],
+        ]
+        const tailVisitMap: TailVisitMapType = [[0, 0], [0, 0], [0, 0]]
+        const expectedRopeMap: RopeMapType = [
+          ['H', '.'],
+          ['T', '.'],
+          ['.', '.'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [[0, 0], [1, 0], [0, 0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets command "D 1" with H right of T and on row below T and moves T above of H', () => {
+        const commands: Motion[] = [{command: 'D', steps: 1}]
+        const ropeMap: RopeMapType = [
+          ['T', '.'],
+          ['.', 'H'],
+          ['.', '.'],
+        ]
+        const tailVisitMap: TailVisitMapType = [[0, 0], [0, 0], [0, 0]]
+        const expectedRopeMap: RopeMapType = [
+          ['.', '.'],
+          ['.', 'T'],
+          ['.', 'H'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [[0, 0], [0, 1], [0, 0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets command "D 1" with H left of T and on row below T and moves T above of H', () => {
+        const commands: Motion[] = [{command: 'D', steps: 1}]
+        const ropeMap: RopeMapType = [
+          ['.', 'T'],
+          ['H', '.'],
+          ['.', '.'],
+        ]
+        const tailVisitMap: TailVisitMapType = [[0, 0], [0, 0], [0, 0]]
+        const expectedRopeMap: RopeMapType = [
+          ['.', '.'],
+          ['T', '.'],
+          ['H', '.'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [[0, 0], [1, 0], [0, 0]]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+    })
+
+    describe('moving the exampe', () => {
+      it('gets the example commands 1 as input and produces the example result', () => {
+        const input = `R 4`
+        const commands: Motion[] = parseMotions(input)
+        const ropeMap: RopeMapType = [['s']]
+        const tailVisitMap: TailVisitMapType = [['s']]
+        const expectedRopeMap: RopeMapType = [
+          ['s', '.', '.', 'T', 'H'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [
+          ['s', 1, 1, 1, 0],
+        ]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets the example commands 1-2 as input and produces the example result', () => {
+        const input = `R 4
+        U 4`
+        const commands: Motion[] = parseMotions(input)
+        const ropeMap: RopeMapType = [['s']]
+        const tailVisitMap: TailVisitMapType = [['s']]
+        const expectedRopeMap: RopeMapType = [
+          ['.', '.', '.', '.', 'H'],
+          ['.', '.', '.', '.', 'T'],
+          ['.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.'],
+          ['s', '.', '.', '.', '.'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [
+          [ 0,  0, 0, 0, 0],
+          [ 0,  0, 0, 0, 1],
+          [ 0,  0, 0, 0, 1],
+          [ 0,  0, 0, 0, 1],
+          ['s', 1, 1, 1, 0],
+        ]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets the example commands 1-3 as input and produces the example result', () => {
+        const input = `R 4
+        U 4
+        L 3`
+        const commands: Motion[] = parseMotions(input)
+        const ropeMap: RopeMapType = [['s']]
+        const tailVisitMap: TailVisitMapType = [['s']]
+        const expectedRopeMap: RopeMapType = [
+          ['.', 'H', 'T', '.', '.'],
+          ['.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.'],
+          ['s', '.', '.', '.', '.'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [
+          [ 0,  0, 1, 1, 0],
+          [ 0,  0, 0, 0, 1],
+          [ 0,  0, 0, 0, 1],
+          [ 0,  0, 0, 0, 1],
+          ['s', 1, 1, 1, 0],
+        ]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets the example commands 1-4 as input and produces the example result', () => {
+        const input = `R 4
+        U 4
+        L 3
+        D 1`
+        const commands: Motion[] = parseMotions(input)
+        const ropeMap: RopeMapType = [['s']]
+        const tailVisitMap: TailVisitMapType = [['s']]
+        const expectedRopeMap: RopeMapType = [
+          ['.', '.', 'T', '.', '.'],
+          ['.', 'H', '.', '.', '.'],
+          ['.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.'],
+          ['s', '.', '.', '.', '.'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [
+          [ 0,  0, 1, 1, 0],
+          [ 0,  0, 0, 0, 1],
+          [ 0,  0, 0, 0, 1],
+          [ 0,  0, 0, 0, 1],
+          ['s', 1, 1, 1, 0],
+        ]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets the example commands as input and produces the example result', () => {
+        const input = `R 4
+        U 4
+        L 3
+        D 1
+        R 4
+        D 1
+        L 5
+        R 2`
+        const commands: Motion[] = parseMotions(input)
+        const ropeMap: RopeMapType = [['s']]
+        const tailVisitMap: TailVisitMapType = [['s']]
+        const expectedRopeMap: RopeMapType = [
+          ['.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.'],
+          ['.', 'T', 'H', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.'],
+          ['s', '.', '.', '.', '.', '.'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [
+          [0, 0, 1, 1, 0, 0],
+          [0, 0, 0, 1, 2, 0],
+          [0, 1, 1, 1, 1, 0],
+          [0, 0, 0, 0, 1, 0],
+          ['s', 1, 1, 1, 0, 0],
+        ]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+
+      it('gets the puzzle #1 command 90 as input and produces a result', () => {
+        const input = `D 2`
+        const commands: Motion[] = parseMotions(input)
+        const ropeMap: RopeMapType = [
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', 'T', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', 'H', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', 's', '.', '.', '.', '.'],
+        ]
+        const tailVisitMap: TailVisitMapType = [
+          [0, 0, 0, 0, 0, 0,  0 , 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0,  0 , 1, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0,  0 , 1, 1, 0, 0],
+          [0, 0, 0, 0, 0, 0,  1 , 1, 1, 0, 0],
+          [0, 0, 0, 0, 0, 0,  1 , 0, 0, 1, 0],
+          [0, 0, 0, 0, 0, 0,  0 , 1, 1, 0, 0],
+          [0, 0, 0, 0, 0, 0,  1 , 0, 0, 1, 0],
+          [0, 0, 0, 0, 0, 1,  0 , 0, 0, 1, 0],
+          [0, 0, 0, 1, 1, 1,  0 , 0, 0, 0, 1],
+          [0, 1, 0, 1, 1, 3,  2 , 1, 0, 1, 0],
+          [1, 0, 1, 3, 2, 1,  1 , 0, 1, 0, 0],
+          [0, 1, 2, 1, 1, 1, 's', 0, 0, 0, 0],
+        ]
+        const expectedRopeMap: RopeMapType = [
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+          ['.', 'T', '.', '.', '.', '.', 's', '.', '.', '.', '.'],
+          ['.', 'H', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+        ]
+        const expectedTailVisitMap: TailVisitMapType = [
+          [0, 0, 0, 0, 0, 0,  0 , 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0,  0 , 1, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0,  0 , 1, 1, 0, 0],
+          [0, 0, 0, 0, 0, 0,  1 , 1, 1, 0, 0],
+          [0, 0, 0, 0, 0, 0,  1 , 0, 0, 1, 0],
+          [0, 0, 0, 0, 0, 0,  0 , 1, 1, 0, 0],
+          [0, 0, 0, 0, 0, 0,  1 , 0, 0, 1, 0],
+          [0, 0, 0, 0, 0, 1,  0 , 0, 0, 1, 0],
+          [0, 0, 0, 1, 1, 1,  0 , 0, 0, 0, 1],
+          [0, 1, 0, 1, 1, 3,  2 , 1, 0, 1, 0],
+          [1, 1, 1, 3, 2, 1,  1 , 0, 1, 0, 0],
+          [0, 2, 2, 1, 1, 1, 's', 0, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0,  0 , 0, 0, 0, 0],
+        ]
+  
+        executeCommands(commands, ropeMap, tailVisitMap)
+        
+        expect(ropeMap).toStrictEqual(expectedRopeMap)
+        expect(tailVisitMap).toStrictEqual(expectedTailVisitMap)
+      })
+    })
+  })
+
+  describe('countVisitedPositions', () => {
+    it('gets the example motions as input and returns 13', () => {
+      const input = `R 4
+      U 4
+      L 3
+      D 1
+      R 4
+      D 1
+      L 5
+      R 2`
+      expect(countVisitedPositions(input)).toBe(13)
+    })
+
+    it('gets the puzzle motions 0-90 as input and returns 39', () => {
+      const input = `U 1
+      D 1
+      L 1
+      U 2
+      L 1
+      D 2
+      L 2
+      U 2
+      L 1
+      R 2
+      U 2
+      D 1
+      R 2
+      U 1
+      R 1
+      U 1
+      R 1
+      U 2
+      L 1
+      U 2
+      D 1
+      R 1
+      U 2
+      D 1
+      U 2
+      D 2
+      U 2
+      D 1
+      R 1
+      D 2
+      L 2
+      R 2
+      L 1
+      R 2
+      D 2
+      L 2
+      U 1
+      D 2
+      R 2
+      L 2
+      R 2
+      D 2
+      R 1
+      D 1
+      L 1
+      D 1
+      L 2
+      D 1
+      R 1
+      L 1
+      U 2
+      L 2
+      U 1
+      D 1
+      U 1
+      D 1
+      L 2
+      D 2
+      L 2
+      U 1
+      R 2
+      D 1
+      U 1
+      R 2
+      L 1
+      R 1
+      L 1
+      R 2
+      L 1
+      U 2
+      R 1
+      L 1
+      U 1
+      D 2
+      R 1
+      D 2
+      L 1
+      U 2
+      D 2
+      L 2
+      U 1
+      L 1
+      D 1
+      L 2
+      U 2
+      R 2
+      U 1
+      D 2
+      L 1
+      D 2`
+      expect(countVisitedPositions(input)).toBe(39)
+    })
+  })
+
+  describe('solves puzzle #1', () => {
+    it('gets the puzzle input and returns the number of visited knots', () => {
+      const solution = countVisitedPositions(aoc.puzzleInput)
+      console.log('puzzle #1 answer: ', solution)
+      console.log('6885 is too high. I do not get it according to all the tests here')
+      expect(solution).toBe(6885)
     })
   })
 })

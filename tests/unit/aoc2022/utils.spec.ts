@@ -13,7 +13,6 @@ import {
   prependRow,
   distanceInArray,
   matrixReduce,
-  Coordinate2D,
   findCoordinate2D,
   setMatrixValue,
 } from '@/aoc2022/utils'
